@@ -12,3 +12,12 @@
 
 ---
 
+## Sem. 2 · 17–23 ago
+
+**Feito:** Modelo de dados preliminar; Atualização do modelo c4-containers
+
+**Bloqueou:** Nada
+
+**Próxima semana:** Wireframes da interface gráfica; ADR´s das decisões tomadas; Continuação da redação dos capítulos 1 e 2 do relatório. 
+
+---
