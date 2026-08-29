@@ -21,3 +21,13 @@
 **Próxima semana:** Wireframes da interface gráfica; ADR´s das decisões tomadas; Continuação da redação dos capítulos 1 e 2 do relatório. 
 
 ---
+
+## Sem. 3 · 24–30 ago
+
+**Feito:** Wireframes da interface gráfica; ADR's das decisões tomadas; Gestão de risco.
+
+**Bloqueou:** Nada
+
+**Próxima semana:** Início da implementação do núcleo; Completar capítulos 1 e 2.
+
+---
