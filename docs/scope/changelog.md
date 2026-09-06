@@ -31,3 +31,18 @@
 **Próxima semana:** Início da implementação do núcleo; Completar capítulos 1 e 2.
 
 ---
+
+## Sem. 4 · 31 ago–6 set
+
+**Feito:** 
+- Adição da ADR-005;
+- Implementação:
+  - Início da implementação do modelo de teoria musical;
+  - Adição das definições de notas e tipos de escala ao modelo de teoria musical;
+  - Início da implementação do gerador de exercícios;
+  - Implementação parcial da geração de exercícios de reconhecimento de intervalos (seleção de tónica e tipo de escala, geração de escalas, geração de respostas erradas)
+
+**Bloqueou:** Nada 
+
+**Próxima semana:** Terminar implementação da geração de exercícios de intervalos; Início da implementação do módulo responsável pela gestão de exercícios.
+
