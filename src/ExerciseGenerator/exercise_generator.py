@@ -3,17 +3,30 @@ from src.MusicTheoryModel.music_theory_model import *
 import random
 
 class Exercise: #Formato de um exercicio
-    def __init__(self, title, correct_answer, wrong_answers):
+    def __init__(self, title, correct_answer, wrong_answers, explanation):
         self.title = title
         self.wrong_options = wrong_answers
         self.correct_answer = correct_answer
-        self.explanation = None
+        self.explanation = explanation
 
 class IntervalScaleExercise(Exercise): #Exercicio de reconhecimento de intervalos no contexto de uma escala
 
-    def __init__(self, title, correct_answer, wrong_answers, scale):
-        super().__init__(title, correct_answer, wrong_answers)
+    def __init__(self, scale, interval_note, title, correct_answer, wrong_answers, explanation):
+        super().__init__(title, correct_answer, wrong_answers, explanation)
         self.scale=scale
+        self.interval_note=interval_note
+
+
+    def __str__(self):
+        note_names="|".join(note.name for note in self.scale.notes)
+        return (f"--------------\n"
+                f"Titulo: {self.title}\n"
+                f"Escala: {self.scale.tonic.name} {self.scale.scale_type.name}\n"
+                f"Notas da escala {note_names}\n"
+                f"Opção correta: {self.correct_answer}\n"
+                f"Opções erradas: {self.wrong_options}\n"
+                f"Explicação: {self.explanation}")
+
 
 class Scale: #Escala musical
     def __init__(self, tonic, scale_type, notes):
@@ -33,7 +46,9 @@ class ExerciseGenerator: #Gerador de exercicios
         interval_note=random.choice(scale.notes[1:]) #Escolher uma nota da escala para obter o intervalo do exercicio
         interval_note_degree=scale.notes.index(interval_note)+1 #Grau da nota do intervalo
         wrong_options=self.generate_interval_wrong_options(interval_note_degree, len(scale.notes), difficulty) #Gerar opções de reposta erradas
-        return IntervalScaleExercise("Titulo Placeholder", interval_note_degree, wrong_options, scale)
+        explanation=self.generate_scale_interval_explanation(scale, interval_note)
+
+        return IntervalScaleExercise(scale, interval_note,"Reconhecimento de intervalos em escalas musicais", interval_note_degree, wrong_options, explanation)
 
     def generate_scale(self, difficulty): #Gera uma escala musical
         tonic = random.choice(self.theory_model.TONICS) #Escolher uma nota aleatoria para ser a tonica da escala
@@ -55,7 +70,7 @@ class ExerciseGenerator: #Gerador de exercicios
         notes.append(tonic) #Adicionar tonica às notas da escala
 
         for i in range(1,len(scale_type.scale_degrees)): #Calcular as notas da escala com base na tónica e tipo de escala
-            pitch=notes[i-1].pitch+scale_type.note_steps[i] #calcular o tom da nota ao incrementar a nota anterior pelo valor do intervalo em note_steps
+            pitch=notes[i-1].pitch+scale_type.note_steps[i-1] #calcular o tom da nota ao incrementar a nota anterior pelo valor do intervalo em note_steps
             degree_index=scale_type.scale_degrees[i]-1 #Obter indice to grau da nota atual
             natural_pitch=r_natural_pitches[degree_index] #Obter a nota natural associada ao grau da nota
             difference=pitch - natural_pitch #Desvio do tom da nota à nota natural associada ao grau
@@ -116,6 +131,21 @@ class ExerciseGenerator: #Gerador de exercicios
                 answer_options.remove(option)
 
         return answer_options
+
+    def generate_scale_interval_explanation(self, scale, interval_note): #Constroi a explicação para o exercicio de intervalos
+        tonic=scale.tonic.name
+        scale_type=scale.scale_type.name
+        intervals = "|".join( str(interval) for interval in scale.scale_type.note_steps)
+        note_names = "|".join(note.name for note in scale.notes)
+        degree=scale.notes.index(interval_note)+1
+        explanation=(f"A escala do exercicio é a escala de {tonic} {scale_type}\n"
+                     f"Uma escala {scale_type} é sempre obtida aplicando a seguinte série de intervalos a partir da tónica:\n"
+                     f"{intervals}\n"
+                     f"Para a tónica {tonic} a aplicação dos intervalos resulta na obtenção das notas da escala:\n"
+                     f"{note_names}\n"
+                     f"A nota reproduzida foi {interval_note.name} que corresponde ao {degree} grau da escala")
+        return explanation
+
 
 
 
