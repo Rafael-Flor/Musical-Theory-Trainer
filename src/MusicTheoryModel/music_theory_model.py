@@ -39,12 +39,12 @@ class MusicTheoryModel:
         Note(11, "B")] #Tónicas possiveis
     def __init__(self):
         self.scale_types=[ #Definição dos tipos de escala do modelo
-            ScaleType("Major", [1, 2, 3, 4, 5, 6, 7], [0, 2, 2, 1, 2, 2, 2, 1]),
-            ScaleType("Minor", [1, 2, 3, 4, 5, 6, 7], [0, 2, 1, 2, 2, 1, 2, 2]),
-            ScaleType("Major Pentatonic", [1, 2, 3, 5, 6], [0, 2, 2, 3, 2]),
-            ScaleType("Minor Pentatonic", [1, 3, 4, 5, 7], [0, 3, 2, 2, 3]),
-            ScaleType("Mixolydian", [1, 2, 3, 4, 5, 6, 7], [0, 2, 2, 1, 2, 2, 1, 2]),
-            ScaleType("Dorian", [1, 2, 3, 4, 5, 6, 7],[0, 2, 1, 2, 2, 2, 1, 2])
+            ScaleType("Major", [1, 2, 3, 4, 5, 6, 7], [2, 2, 1, 2, 2, 2, 1]),
+            ScaleType("Minor", [1, 2, 3, 4, 5, 6, 7], [2, 1, 2, 2, 1, 2, 2]),
+            ScaleType("Major Pentatonic", [1, 2, 3, 5, 6], [2, 2, 3, 2]),
+            ScaleType("Minor Pentatonic", [1, 3, 4, 5, 7], [3, 2, 2, 3]),
+            ScaleType("Mixolydian", [1, 2, 3, 4, 5, 6, 7], [2, 2, 1, 2, 2, 1, 2]),
+            ScaleType("Dorian", [1, 2, 3, 4, 5, 6, 7],[2, 1, 2, 2, 2, 1, 2])
         ]
 
 
