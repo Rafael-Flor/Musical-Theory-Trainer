@@ -1,5 +1,5 @@
 
-from src.MusicTheoryModel.music_theory_model import MusicTheoryModel
+from src.MusicTheoryModel.music_theory_model import *
 import random
 
 class Exercise: #Formato de um exercicio
@@ -15,14 +15,12 @@ class IntervalScaleExercise(Exercise): #Exercicio de reconhecimento de intervalo
         super().__init__(title, correct_answer, wrong_answers)
         self.scale=scale
 
-
 class Scale: #Escala musical
     def __init__(self, tonic, scale_type, notes):
         self.tonic=tonic
         self.scale_type=scale_type
         self.notes=notes
-        self.note_names=None
-        self.scale_name=None
+
 
 class ExerciseGenerator: #Gerador de exercicios
     scale_difficulty_settings = {"easy": ("Major"), "medium": ("Major", "Minor"), "hard" :("Major", "Minor", "Major Pentatonic", "Minor Pentatonic", "Mixolydian", "Dorian")} #Definições de dificuldade relativas ao tipo de escala
@@ -39,12 +37,42 @@ class ExerciseGenerator: #Gerador de exercicios
 
     def generate_scale(self, difficulty): #Gera uma escala musical
         tonic = random.choice(self.theory_model.TONICS) #Escolher uma nota aleatoria para ser a tonica da escala
-        scale_type = self.select_scale_type(difficulty) #Esolher aleatoriamente um tipo de escala
+        scale_type = self.select_scale_type(difficulty) #Tendo em conta as definições de dificuldade, esolher aleatoriamente um tipo de escala
         notes = []
-        for offset in scale_type.note_offsets: #Calcular as notas da escala com base na tónica e tipo de escala obtidos
-            notes.append(tonic + offset)
-        # note_names = self.build_note_names(notes, scale_type.scale_degrees)
-        # scale_name = note_names[0] + scale_type.name
+        natural_pitches = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23] #Tons das notas naturais
+        natural_names=["C","D","E","F","G","A","B","C","D","E","F","G","A","B"] #Nomes das notas naturais
+
+        if tonic.pitch in natural_pitches: #Localizar o indice da nota natural associada à tonica
+            index = natural_pitches.index(tonic.pitch)
+        elif "#" in tonic.name:
+            index=natural_pitches.index(tonic.pitch-1)
+        elif "b" in tonic.name:
+            index = natural_pitches.index(tonic.pitch + 1)
+
+        r_natural_pitches = natural_pitches[index:] + natural_pitches[:index] #Rodar as listas para começarem na nota natural associada à tonica
+        r_natural_names=natural_names[index:]+natural_names[:index]
+
+        notes.append(tonic) #Adicionar tonica às notas da escala
+
+        for i in range(1,len(scale_type.scale_degrees)): #Calcular as notas da escala com base na tónica e tipo de escala
+            pitch=notes[i-1].pitch+scale_type.note_steps[i] #calcular o tom da nota ao incrementar a nota anterior pelo valor do intervalo em note_steps
+            degree_index=scale_type.scale_degrees[i]-1 #Obter indice to grau da nota atual
+            natural_pitch=r_natural_pitches[degree_index] #Obter a nota natural associada ao grau da nota
+            difference=pitch - natural_pitch #Desvio do tom da nota à nota natural associada ao grau
+            name=""
+
+            if difference == 0: #Obter o nome correto para a nota segundo o desvio relativamente à nota natrual
+                 name=r_natural_names[degree_index]
+            elif difference == 1:
+                name=(r_natural_names[degree_index]+"#")
+            elif difference == -1:
+                name=r_natural_names[degree_index]+"b"
+            elif difference == 2:
+                 name=r_natural_names[degree_index]+"##"
+            elif difference == -2:
+                name=r_natural_names[degree_index]+"bb"
+            notes.append(Note(pitch,name))
+
         return Scale(tonic, scale_type, notes)
 
 
@@ -55,7 +83,6 @@ class ExerciseGenerator: #Gerador de exercicios
             if scale_type.name in self.scale_difficulty_settings[difficulty]:
                 possible_scales.append(scale_type)
         return random.choice(possible_scales)
-
 
     def generate_interval_wrong_options(self, correct_answer_degree, scale_degrees, difficulty): #Gera as opções erradas para o exercicio de intervalos de acordo com as definições de dificuldade
         min_range=self.interval_difficulty_settings[difficulty]
@@ -89,7 +116,6 @@ class ExerciseGenerator: #Gerador de exercicios
                 answer_options.remove(option)
 
         return answer_options
-
 
 
 
