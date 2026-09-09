@@ -41,11 +41,15 @@ class ExerciseGenerator: #Gerador de exercicios
     def __init__(self, theory_model):
         self.theory_model=theory_model #Modelo de teoria que o gerador utiliza
 
-    def generate_scale_interval_exercise(self, difficulty): #Gera um exercicio de reconhecimento de intervalos no contexto de uma escala
+    def generate_scale_interval_exercise(self, difficulty, generate_options=True): #Gera um exercicio de reconhecimento de intervalos no contexto de uma escala
         scale=self.generate_scale(difficulty) #Gerar uma escala
         interval_note=random.choice(scale.notes[1:]) #Escolher uma nota da escala para obter o intervalo do exercicio
         interval_note_degree=scale.notes.index(interval_note)+1 #Grau da nota do intervalo
-        wrong_options=self.generate_interval_wrong_options(interval_note_degree, len(scale.notes), difficulty) #Gerar opções de reposta erradas
+        if generate_options:
+            wrong_options=self.generate_interval_wrong_options(interval_note_degree, len(scale.notes), difficulty) #Gerar opções de reposta erradas
+        else:
+            wrong_options=[]
+
         explanation=self.generate_scale_interval_explanation(scale, interval_note)
 
         return IntervalScaleExercise(scale, interval_note,"Reconhecimento de intervalos em escalas musicais", interval_note_degree, wrong_options, explanation)
