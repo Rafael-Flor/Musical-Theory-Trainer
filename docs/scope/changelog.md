@@ -46,3 +46,18 @@
 
 **Próxima semana:** Terminar implementação da geração de exercícios de intervalos; Início da implementação do módulo responsável pela gestão de exercícios.
 
+---
+
+## Sem. 5 · 7 - 13 set
+
+**Feito:** 
+- Revisão e refactor das definições das notas e tipos de escala no modelo de teoria musical;
+- Implementado:
+  - geração de escalas musicais com nomes de notas teoricamente corretos;
+  - geração de explicações para os exercícios de reconhecimento de intervalos em escalas; 
+  - gestor de exercícios com criação de sessões para os exercícios de reconhecimento de intervalos em escalas; 
+     
+**Bloqueou:** Nada 
+
+**Próxima semana:** Terminar implementação da gestão dos exercícios de reconhecimento de intervalos em escalas; Início da implementação do módulo responsável pela reprodução de áudio; Início da implementação da interface gráfica. 
+
