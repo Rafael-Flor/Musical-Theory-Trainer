@@ -30,4 +30,16 @@ class AudioEngine:
         self.synth.noteoff(0, note.pitch + 12 * octave_shift)
         time.sleep(0.5) #Controla a duração da libertação da nota
 
+    def play_note_sequence(self, sequence, note_duration, octave_shift=0): #Inicia um thread para reprodução de notas em sequência
+        if self.is_playing(): return
+        self.play_thread = threading.Thread(target=self._play_note_sequence, args=(sequence, note_duration, octave_shift),daemon=True)
+        self.play_thread.start()
+
+    def _play_note_sequence(self, sequence, note_duration, octave_shift=0): #Reproduz uma sequência de notas
+        for note in sequence:
+            self.synth.noteon(0, note.pitch + 12 * octave_shift, 100)
+            time.sleep(note_duration)
+            self.synth.noteoff(0, note.pitch + 12 * octave_shift)
+            time.sleep(0.5)
+
 
