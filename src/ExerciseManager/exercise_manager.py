@@ -24,6 +24,9 @@ class ExerciseSession: #Sessão para realização de um conjunto de exercícios
     def is_finished(self): #Retorna um bool para indicar se a sessão chegou ao fim
         return self.current_index+1 == len(self.exercises) and self.exercise_answered
 
+    def audio_playing(self): #Verifica se existe áudio em reprodução (reprodução assíncrona)
+        return self.audio_engine.is_playing()
+
     def exercise_title(self): #Retorna o título do exercício atual
         return self.current_exercise().title
 
@@ -58,12 +61,35 @@ class ExerciseSession: #Sessão para realização de um conjunto de exercícios
 
 
 
-class IntervalScaleSession(ExerciseSession): #Sessão para realização de um conjunto de exercícios de reconhecimento de intervalos em escalas
+class IntervalScaleSession(ExerciseSession): #Sessão para realização de um conjunto de exercícios
     def __init__(self,exercises, audio_engine):
         super().__init__(exercises, audio_engine)
         self.exercise_type = "interval_scale"
 
-class ExerciseManager:
+
+    def play_exercise_tonic(self): #Reproduzir a tónica do exercício
+
+        note=self.exercises[self.current_index].scale.tonic
+        self.audio_engine.play_note(note,1,3)
+
+    def play_exercise_interval_note(self): #Reproduzir a nota musical do intervalo
+        note = self.exercises[self.current_index].interval_note
+        self.audio_engine.play_note(note,1,3)
+
+    def play_exercise_interval(self): #Reproduzir o intervalo (tónica e nota do intervalo)
+        t_note=self.exercises[self.current_index].scale.tonic
+        i_note=self.exercises[self.current_index].interval_note
+        notes=[t_note,i_note]
+        self.audio_engine.play_note_sequence(notes,1,3)
+
+    def current_exercise_scale_info(self): #Retorna o nome da escala
+        exercise=self.exercises[self.current_index]
+        return f"Escala {exercise.scale.tonic.name} {exercise.scale.scale_type.name}"
+
+
+
+
+class ExerciseManager: #Gestor de exercícios
 
     def __init__(self):
         self.theory_model=MusicTheoryModel()
@@ -79,8 +105,8 @@ class ExerciseManager:
         else: generate_options=False
         match selected_exercise:
             case "interval_scale":
-                for i in range(selected_exercise_num):
+                for i in range(selected_exercise_num): #Gerar o número de exercícios pretendidos de acordo com as configurações selecionada
                     exercises.append(generator.generate_scale_interval_exercise(selected_difficulty,generate_options))
-                self.exercise_session=IntervalScaleSession(exercises, self.audio_engine)
+                self.exercise_session=IntervalScaleSession(exercises, self.audio_engine) #Criar sessão com os exercícios gerados
 
 
