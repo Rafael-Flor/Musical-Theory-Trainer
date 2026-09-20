@@ -61,3 +61,18 @@
 
 **Próxima semana:** Terminar implementação da gestão dos exercícios de reconhecimento de intervalos em escalas; Início da implementação do módulo responsável pela reprodução de áudio; Início da implementação da interface gráfica. 
 
+---
+
+## Sem. 6 · 14 - 20 set
+
+**Feito:** 
+- Implementado:
+  - mecanismos de reprodução de notas musicais (individuais e sequências) do motor de áudio;  
+  - métodos para controlo do fluxo de sessões de exercícios;
+  - métodos para reprodução áudio em sessões de exercícios de reconhecimento de intervalos em escalas; 
+  - ecrãs para o menu principal e configuração de exercícios;
+    
+     
+**Bloqueou:** Ecrã para resolução dos exercícios de intervalos e para as respetivas explicações, por implementar.
+
+**Próxima semana:** Revisão da implementação e arquitetura; Terminar implementação dos ecrãs, da interface gráfica, necessários para a realização dos exercícios de intervalos.
