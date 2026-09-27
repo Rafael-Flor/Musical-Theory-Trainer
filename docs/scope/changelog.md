@@ -76,3 +76,15 @@
 **Bloqueou:** Ecrã para resolução dos exercícios de intervalos e para as respetivas explicações, por implementar.
 
 **Próxima semana:** Revisão da implementação e arquitetura; Terminar implementação dos ecrãs, da interface gráfica, necessários para a realização dos exercícios de intervalos.
+---
+
+## Sem. 7 · 21 - 27 set
+
+**Feito:** 
+- Implementado:
+  - definição de eventos;  
+  - ecrã para resolução de exercícios de reconhecimento de intervalos em escalas;
+ 
+**Bloqueou:** Revisão da implementação (disponibilidade limitada)
+
+**Próxima semana:** Redação da documentação em falta; Implementação dos ecrãs em falta para realizar uma sessão completa de exercícios; Conexão da interface com a lógica da aplicação.
