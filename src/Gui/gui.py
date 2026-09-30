@@ -13,11 +13,15 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.main_menu = MainMenu()
         self.config_page = ConfigPage()
         self.int_scale_exercise_page = IntervalScaleExPage()
+        self.explanation_page = ExplanationPage()
+        self.evaluation_page = EvaluationPage()
 
         #Adicionar páginas às páginas da interface
         self.pages.addWidget(self.main_menu)
         self.pages.addWidget(self.config_page)
         self.pages.addWidget(self.int_scale_exercise_page)
+        self.pages.addWidget(self.explanation_page)
+        self.pages.addWidget(self.evaluation_page)
 
         #Tornar a estrutura de páginas o objeto central da interface
         self.setCentralWidget(self.pages)
@@ -30,11 +34,22 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.config_page.set_exercise(exercise_title, exercise_code) #Atualizar página com informação do exercício
         self.pages.setCurrentWidget(self.config_page) #Mostrar a página de configuração
 
+    def show_menu(self):
+        self.pages.setCurrentWidget(self.main_menu)
+
     def show_interval_scale_page(self, scale_info, options):
         self.int_scale_exercise_page.set_current_exercise(scale_info)
         self.int_scale_exercise_page.set_answer_options(options)
+        self.int_scale_exercise_page.enable_options()
         self.pages.setCurrentWidget(self.int_scale_exercise_page)
 
+    def show_explanation_page(self, explanation):
+        self.explanation_page.set_explanation(explanation)
+        self.pages.setCurrentWidget(self.explanation_page)
+
+    def show_evaluation_page(self, correct_count, accuracy, evaluation):
+        self.evaluation_page.set_stats(correct_count, accuracy, evaluation)
+        self.pages.setCurrentWidget(self.evaluation_page)
 
 class MainMenu(QtWidgets.QWidget): #Página do menu principal
     exercise_selected = QtCore.Signal(str, str) #Sinal a emitir quando um exercício for selecionado
@@ -203,5 +218,59 @@ class IntervalScaleExPage(QtWidgets.QWidget): #Página para resolução de exerc
         self.op2_bt.setDisabled(True)
         self.op3_bt.setDisabled(True)
         self.op4_bt.setDisabled(True)
+
+
+
+class ExplanationPage(QtWidgets.QWidget):
+    next_exercise_requested = Event()
+    def __init__(self):
+        super().__init__()
+
+        self.layout = QtWidgets.QVBoxLayout(self)
+        self.layout.setAlignment(QtCore.Qt.AlignTop)
+        self.layout.setContentsMargins(0, 50, 0, 0)
+
+        self.explanation=QtWidgets.QLabel("")
+        self.continue_bt=QtWidgets.QPushButton("Continuar")
+        self.continue_bt.clicked.connect(lambda : self.next_exercise_requested.emit())
+
+        self.layout.addWidget(self.explanation)
+        self.layout.addWidget(self.continue_bt)
+
+    def set_explanation(self, explanation):
+        self.explanation.setText(explanation)
+
+class EvaluationPage(QtWidgets.QWidget): #Página para apresentação da avaliação de desempenho
+    eval_continue_pressed = Event()
+    def __init__(self):
+        super().__init__()
+
+        self.layout = QtWidgets.QVBoxLayout(self)
+        self.layout.setAlignment(QtCore.Qt.AlignTop)
+        self.layout.setContentsMargins(0, 50, 0, 0)
+
+        self.correct_stat=QtWidgets.QLabel("")
+        self.precision_stat = QtWidgets.QLabel("")
+        self.eval_stat = QtWidgets.QLabel("")
+
+        self.continue_bt = QtWidgets.QPushButton("Continuar")
+        self.continue_bt.clicked.connect(lambda: self.eval_continue_pressed.emit())
+
+
+        self.layout.addWidget(self.correct_stat)
+        self.layout.addWidget(self.precision_stat)
+        self.layout.addWidget(self.eval_stat)
+        self.layout.addWidget(self.continue_bt)
+
+    def set_stats(self, correct_count, accuracy, evaluation): #Atualiza as estatiscas de avaliação
+        self.correct_stat.setText("Respostas corretas: "+str(correct_count))
+        self.precision_stat.setText("Precisão: "+str(accuracy))
+        self.eval_stat.setText("Avaliação: " + str(evaluation))
+
+
+
+
+
+
 
 
