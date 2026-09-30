@@ -1,3 +1,4 @@
+from typing import List
 
 from src.MusicTheoryModel.music_theory_model import *
 import random
@@ -36,10 +37,11 @@ class ExerciseGenerator: #Gerador de exercicios
     def generate_scale_interval_exercise(self, difficulty, generate_options=True): #Gera um exercicio de reconhecimento de intervalos no contexto de uma escala
         scale=self.generate_scale(difficulty) #Gerar uma escala
         interval_note=random.choice(scale.notes[1:]) #Escolher uma nota da escala para obter o intervalo do exercicio
-        interval_note_degree=scale.notes.index(interval_note)+1 #Grau da nota do intervalo
+        interval_note_index=scale.notes.index(interval_note) #Grau da nota do intervalo
+        interval_note_degree=scale.scale_type.scale_degrees[interval_note_index]
 
         if generate_options:
-            wrong_options=self.generate_interval_wrong_options(interval_note_degree, len(scale.notes), difficulty) #Gerar opções de reposta erradas
+            wrong_options=self.generate_interval_wrong_options(interval_note_degree, scale.scale_type.scale_degrees) #Gerar opções de reposta erradas
         else:
             wrong_options=[]
 
@@ -104,37 +106,15 @@ class ExerciseGenerator: #Gerador de exercicios
                 possible_scales.append(scale_type)
         return random.choice(possible_scales)
 
-    def generate_interval_wrong_options(self, correct_answer_degree, scale_degrees, difficulty): #Gera as opções erradas para o exercicio de intervalos de acordo com as definições de dificuldade
-        min_range=self.interval_difficulty_settings[difficulty]
-
-        left_item=correct_answer_degree-min_range
-        right_item=correct_answer_degree+min_range
+    def generate_interval_wrong_options(self, correct_answer_degree, scale_degrees): #Gera as opções erradas para o exercicio de intervalos
         answer_options=[]
-
-        possible_options=list(range(1,scale_degrees+1))
+        possible_options=list(scale_degrees)
         possible_options.remove(correct_answer_degree)
 
-        while left_item>=1 or right_item <=scale_degrees:
-            if left_item>=1:
-                answer_options.append(left_item)
-                possible_options.remove(left_item)
-                left_item=left_item-min_range
-
-            if right_item<=scale_degrees:
-                answer_options.append(right_item)
-                possible_options.remove(right_item)
-                right_item=right_item+min_range
-
-
-        while len(answer_options) != 3:
-            if len(answer_options)<3:
-                option=random.choice(possible_options)
-                answer_options.append(option)
-                possible_options.remove(option)
-            else:
-                option = random.choice(answer_options)
-                answer_options.remove(option)
-
+        while len(answer_options) < 3:
+            answer_degree=random.choice(possible_options)
+            possible_options.remove(answer_degree)
+            answer_options.append(answer_degree)
         return answer_options
 
     def generate_scale_interval_explanation(self, scale, interval_note): #Constroi a explicação para o exercicio de intervalos
