@@ -27,14 +27,6 @@ class IntervalScaleExercise(Exercise): #Exercicio de reconhecimento de intervalo
                 f"Opções erradas: {self.wrong_options}\n"
                 f"Explicação: {self.explanation}")
 
-
-class Scale: #Escala musical
-    def __init__(self, tonic, scale_type, notes):
-        self.tonic=tonic
-        self.scale_type=scale_type
-        self.notes=notes
-
-
 class ExerciseGenerator: #Gerador de exercicios
     scale_difficulty_settings = {"easy": ("Major"), "medium": ("Major", "Minor"), "hard" :("Major", "Minor", "Major Pentatonic", "Minor Pentatonic", "Mixolydian", "Dorian")} #Definições de dificuldade relativas ao tipo de escala
     interval_difficulty_settings= {"easy": 3, "medium": 2, "hard" :1} #Definições de dificuldade relativas aos intervalos apresentados como opções de resposta
@@ -45,6 +37,7 @@ class ExerciseGenerator: #Gerador de exercicios
         scale=self.generate_scale(difficulty) #Gerar uma escala
         interval_note=random.choice(scale.notes[1:]) #Escolher uma nota da escala para obter o intervalo do exercicio
         interval_note_degree=scale.notes.index(interval_note)+1 #Grau da nota do intervalo
+
         if generate_options:
             wrong_options=self.generate_interval_wrong_options(interval_note_degree, len(scale.notes), difficulty) #Gerar opções de reposta erradas
         else:
@@ -54,45 +47,53 @@ class ExerciseGenerator: #Gerador de exercicios
 
         return IntervalScaleExercise(scale, interval_note,"Reconhecimento de intervalos em escalas musicais", interval_note_degree, wrong_options, explanation)
 
-    def generate_scale(self, difficulty): #Gera uma escala musical
+    def generate_scale(self, difficulty): #Gera uma escala musical de acordo com a dificuldade especificada
         tonic = random.choice(self.theory_model.TONICS) #Escolher uma nota aleatoria para ser a tonica da escala
+        scale_tonic = Note(tonic.pitch, tonic.name)
         scale_type = self.select_scale_type(difficulty) #Tendo em conta as definições de dificuldade, esolher aleatoriamente um tipo de escala
-        notes = []
-        natural_pitches = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23] #Tons das notas naturais
-        natural_names=["C","D","E","F","G","A","B","C","D","E","F","G","A","B"] #Nomes das notas naturais
+        notes = self.generate_notes(scale_tonic, scale_type.scale_degrees, scale_type.note_steps)
+        return Scale(tonic, scale_type, notes)
 
-        if tonic.pitch in natural_pitches: #Localizar o indice da nota natural associada à tonica
+    def generate_notes(self, tonic, degrees, steps): #Gera notas musicais utilizando a descrção dos graus e de intervalos entre notas
+        notes = []
+        natural_pitches = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23]  # Tons das notas naturais
+        natural_names = ["C", "D", "E", "F", "G", "A", "B", "C", "D", "E", "F", "G", "A",
+                         "B"]  # Nomes das notas naturais
+
+        if tonic.pitch in natural_pitches:  # Localizar o indice da nota natural associada à tonica
             index = natural_pitches.index(tonic.pitch)
         elif "#" in tonic.name:
-            index=natural_pitches.index(tonic.pitch-1)
+            index = natural_pitches.index(tonic.pitch - 1)
         elif "b" in tonic.name:
             index = natural_pitches.index(tonic.pitch + 1)
 
-        r_natural_pitches = natural_pitches[index:] + natural_pitches[:index] #Rodar as listas para começarem na nota natural associada à tonica
-        r_natural_names=natural_names[index:]+natural_names[:index]
+        r_natural_pitches = natural_pitches[index:] + natural_pitches[
+            :index]  # Rodar as listas para começarem na nota natural associada à tonica
+        r_natural_names = natural_names[index:] + natural_names[:index]
 
-        notes.append(tonic) #Adicionar tonica às notas da escala
+        notes.append(tonic)  # Adicionar tonica às notas da escala
 
-        for i in range(1,len(scale_type.scale_degrees)): #Calcular as notas da escala com base na tónica e tipo de escala
-            pitch=notes[i-1].pitch+scale_type.note_steps[i-1] #calcular o tom da nota ao incrementar a nota anterior pelo valor do intervalo em note_steps
-            degree_index=scale_type.scale_degrees[i]-1 #Obter indice to grau da nota atual
-            natural_pitch=r_natural_pitches[degree_index] #Obter a nota natural associada ao grau da nota
-            difference=pitch - natural_pitch #Desvio do tom da nota à nota natural associada ao grau
-            name=""
+        for i in range(1,
+                       len(degrees)):  # Calcular as notas da escala com base na tónica e tipo de escala
+            pitch = notes[i - 1].pitch + steps[
+                i - 1]  # calcular o tom da nota ao incrementar a nota anterior pelo valor do intervalo em note_steps
+            degree_index = degrees[i] - 1  # Obter indice to grau da nota atual
+            natural_pitch = r_natural_pitches[degree_index]  # Obter a nota natural associada ao grau da nota
+            difference = pitch - natural_pitch  # Desvio do tom da nota à nota natural associada ao grau
+            name = ""
 
-            if difference == 0: #Obter o nome correto para a nota segundo o desvio relativamente à nota natrual
-                 name=r_natural_names[degree_index]
+            if difference == 0:  # Obter o nome correto para a nota segundo o desvio relativamente à nota natrual
+                name = r_natural_names[degree_index]
             elif difference == 1:
-                name=(r_natural_names[degree_index]+"#")
+                name = (r_natural_names[degree_index] + "#")
             elif difference == -1:
-                name=r_natural_names[degree_index]+"b"
+                name = r_natural_names[degree_index] + "b"
             elif difference == 2:
-                 name=r_natural_names[degree_index]+"##"
+                name = r_natural_names[degree_index] + "##"
             elif difference == -2:
-                name=r_natural_names[degree_index]+"bb"
-            notes.append(Note(pitch,name))
-
-        return Scale(tonic, scale_type, notes)
+                name = r_natural_names[degree_index] + "bb"
+            notes.append(Note(pitch, name))
+        return notes
 
 
 
@@ -149,6 +150,9 @@ class ExerciseGenerator: #Gerador de exercicios
                      f"{note_names}\n"
                      f"A nota reproduzida foi {interval_note.name} que corresponde ao {degree} grau da escala")
         return explanation
+
+
+
 
 
 
