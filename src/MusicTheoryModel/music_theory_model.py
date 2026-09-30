@@ -10,6 +10,14 @@ class Note: #Nota musical
             raise ValueError(f"Invalid pitch value {pitch}")
 
 
+class Scale: #Escala musical
+    def __init__(self, tonic, scale_type, notes):
+        self.tonic=tonic
+        self.scale_type=scale_type
+        self.notes=notes
+
+
+
 class ScaleType: #Formato genérico para um tipo de escala
     def __init__(self, name, scale_degrees, note_steps):
         self.name=name
@@ -19,7 +27,7 @@ class ScaleType: #Formato genérico para um tipo de escala
 
 class MusicTheoryModel:
     NATURAL_NOTE_NAMES=["C","D","E","F","G","A","B"]
-    TONICS = [
+    TONICS = (
         Note(0, "C"),
         Note(1, "C#"),
         Note(1, "Db"),
@@ -36,7 +44,7 @@ class MusicTheoryModel:
         Note(9, "A"),
         Note(10, "A#"),
         Note(10, "Bb"),
-        Note(11, "B")] #Tónicas possiveis
+        Note(11, "B")) #Tónicas possiveis
     def __init__(self):
         self.scale_types=[ #Definição dos tipos de escala do modelo
             ScaleType("Major", [1, 2, 3, 4, 5, 6, 7], [2, 2, 1, 2, 2, 2, 1]),
