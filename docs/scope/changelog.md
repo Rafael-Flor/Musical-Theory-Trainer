@@ -88,3 +88,19 @@
 **Bloqueou:** Revisão da implementação (disponibilidade limitada)
 
 **Próxima semana:** Redação da documentação em falta; Implementação dos ecrãs em falta para realizar uma sessão completa de exercícios; Conexão da interface com a lógica da aplicação.
+
+---
+
+## Sem. 8 · 28 set- 04 out
+
+**Feito:** 
+
+- Adição de ADR's
+- Implementado:
+  - Ecrãs da interface para explicações e avaliação de desempenho;  
+  - Controlo principal da aplicação necessário à realização de exercícios de reconhecimento de intervalos;
+ 
+**Bloqueou:** Nada
+
+**Próxima semana:** Implementar: modelo de teoria necessário à geração de progressões harmónicas; Geração de exercícios de reconhecimento de progressões harmónicas; Sessões de exercícios de reconhecimento de progressões; Ecrãs da interface necessários à realização de exercícios de reconhecimento de progressões; Controlo principal da aplicação para os exercícios de progressões harmónicas. 
+
