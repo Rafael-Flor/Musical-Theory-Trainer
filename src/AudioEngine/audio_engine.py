@@ -1,3 +1,4 @@
+from pathlib import Path
 import threading
 import tinysoundfont
 import  time
@@ -6,7 +7,10 @@ import  time
 class AudioEngine:
     def __init__(self):
         self.synth = tinysoundfont.Synth()
-        self.soundfont = self.synth.sfload("../AudioEngine/YDP-GrandPiano.sf2")
+
+        app_dir = Path(__file__).resolve().parent
+        soundfont_path = app_dir / "YDP-GrandPiano.sf2"
+        self.soundfont = self.synth.sfload(str(soundfont_path))
         self.synth.program_select(0, self.soundfont, 0, 0)
         self.play_thread=None
         self.synth.start()
