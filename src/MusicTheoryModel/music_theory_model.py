@@ -22,6 +22,12 @@ class Chord: #Acorde
         self.chord_type=chord_type
         self.notes=notes
 
+class ChordProg: #Progressão Harmónica
+    def __init__(self, scale, prog_type, prog_chords):
+        self.scale=scale
+        self.prog_type=prog_type
+        self.prog_chords=prog_chords
+
 class ScaleType: #Formato genérico para um tipo de escala
     def __init__(self, name, scale_degrees, note_steps):
         self.name=name
@@ -33,6 +39,12 @@ class ChordType: #Formato genérico para um tipo de acorde
         self.name=name
         self.chord_degrees=chord_degrees
         self.note_steps=note_steps
+
+class ChordProgType: #Formato genérico para um tipo de progressão harmónica
+    def __init__(self, name, chord_types, prog_degrees):
+        self.name=name
+        self.chord_types=chord_types
+        self.prog_degrees=prog_degrees
 
 class MusicTheoryModel:
     NATURAL_NOTE_NAMES=["C","D","E","F","G","A","B"]
@@ -72,4 +84,13 @@ class MusicTheoryModel:
             ChordType("Diminished", [1, 3, 5], [3, 3]),
             ChordType("Diminished7", [1, 3, 5, 7], [3, 3, 3]),
         ]
- 
+        self.chord_prog_types=[     #Definição dos tipos de progressões do modelo
+            ChordProgType("I-V", ("Major","Major"), [1,5]),
+            ChordProgType("I-IV", ("Major", "Major"), [1,4]),
+            ChordProgType("I-vi", ("Major", "Minor"), [1,6]),
+            ChordProgType("ii-V", ("Minor", "Major"), [2,5]),
+            ChordProgType("vi-IV", ("Minor", "Major"), [6,4]),
+            ChordProgType("ii-V7-I", ("Minor", "7", "Major"), [2,5,1]),
+        ]
+
+
