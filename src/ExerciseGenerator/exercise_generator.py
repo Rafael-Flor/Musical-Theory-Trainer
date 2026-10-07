@@ -1,5 +1,5 @@
 
-from src.MusicTheoryModel.music_theory_model import Scale, Note
+from src.MusicTheoryModel.music_theory_model import Scale, Note, Chord, ChordProg
 
 import random
 
@@ -30,7 +30,7 @@ class IntervalScaleExercise(Exercise):
 
 class ExerciseGenerator: #Gerador de exercicios
     scale_difficulty_settings = {"easy": ("Major",), "medium": ("Major", "Minor"), "hard" :("Major", "Minor", "Major Pentatonic", "Minor Pentatonic", "Mixolydian", "Dorian")} #Definições de dificuldade relativas ao tipo de escala
-
+    prog_difficulty_settings = {"easy":("I-V","I-IV","I-vi","ii-V")}
     def __init__(self, theory_model):
         self.theory_model=theory_model #Modelo de teoria que o gerador utiliza
 
@@ -59,8 +59,7 @@ class ExerciseGenerator: #Gerador de exercicios
     def generate_notes(self, tonic, degrees, steps): #Gera notas musicais utilizando a descirção dos graus e de intervalos entre notas
         notes = []
         natural_pitches = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23]  # Tons das notas naturais
-        natural_names = ["C", "D", "E", "F", "G", "A", "B", "C", "D", "E", "F", "G", "A",
-                         "B"]  # Nomes das notas naturais
+        natural_names = ["C", "D", "E", "F", "G", "A", "B", "C", "D", "E", "F", "G", "A","B"]  # Nomes das notas naturais
 
         if tonic.pitch in natural_pitches:  # Localizar o indice da nota natural associada à tonica
             index = natural_pitches.index(tonic.pitch)
@@ -69,8 +68,7 @@ class ExerciseGenerator: #Gerador de exercicios
         elif "b" in tonic.name:
             index = natural_pitches.index(tonic.pitch + 1)
 
-        r_natural_pitches = natural_pitches[index:] + natural_pitches[
-            :index]  # Rodar as listas para começarem na nota natural associada à tonica
+        r_natural_pitches = natural_pitches[index:] + natural_pitches[:index]  # Rodar as listas para começarem na nota natural associada à tonica
         r_natural_names = natural_names[index:] + natural_names[:index]
 
         notes.append(tonic)  # Adicionar tónica às notas da escala
@@ -129,6 +127,35 @@ class ExerciseGenerator: #Gerador de exercicios
                      f"A nota reproduzida foi {interval_note.name} que corresponde ao {degree} grau da escala")
         return explanation
 
+    def generate_prog(self, difficulty): #gera uma progressão harmónica de acordo com a dificuldade especificada
+        prog_scale=self.generate_scale("easy") #gerar uma escala aleatoria, "easy"-gerar apenas escalas maiores e menores
+        prog_type=self.select_prog_type(difficulty) #tendo em conta a dificuldade escolhida, escolher um tipo de progressão
+        prog_chords=[]
+        for i in range(len(prog_type.chord_types)): #para cada acorde no tipo de progressão
+            chord_type_name=prog_type.chord_types[i]
+            chord_type=self.get_chord_type(chord_type_name) #obter o tipo do acorde
+            degree=prog_type.prog_degrees[i]
+            chord_tonic_index=prog_scale.scale_type.scale_degrees.index(degree)
+            chord_tonic=prog_scale.notes[chord_tonic_index] #obter a tónica do acorde
+            chord_notes=self.generate_notes(chord_tonic,chord_type.chord_degrees,chord_type.note_steps) #Gerar notas do acorde
+            prog_chords.append(Chord(chord_tonic, chord_type,chord_notes))
+        return ChordProg(prog_scale,prog_type,prog_chords)
+
+
+
+    def get_chord_type(self, type_name): #retorna o tipo de acorde com o nome especificado em argumento
+        for chord_type in self.theory_model.chord_types:
+            if chord_type.name == type_name:
+                return chord_type
+        else:
+            return None
+
+    def select_prog_type(self, difficulty): #escolhe aleatoriamente um tipo de progressão, segundo as definições de dificuldade
+        possible_progs=[]
+        for chord_prog in self.theory_model.chord_prog_types:
+            if chord_prog.name in self.prog_difficulty_settings[difficulty]:
+                possible_progs.append(chord_prog)
+        return random.choice(possible_progs)
 
 
 
