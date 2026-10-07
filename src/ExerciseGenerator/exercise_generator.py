@@ -27,6 +27,24 @@ class IntervalScaleExercise(Exercise):
                 f"Opções erradas: {self.wrong_options}\n"
                 f"Explicação: {self.explanation}")
 
+class ProgressionExercise(Exercise):
+    def __init__(self, progression, title, correct_answer, wrong_answers, explanation):
+        super().__init__(title, correct_answer, wrong_answers, explanation)
+        self.progression=progression
+
+    def __str__(self):
+        chord_names=[]
+        for chord in self.progression.prog_chords:
+            chord_names.append(f"{chord.tonic.name} {chord.chord_type.name}")
+        prog_info=f"{self.progression.prog_type.name} na tonalidade de {self.progression.scale.tonic.name} {self.progression.scale.scale_type.name} "
+        return (f"--------------\n"
+                f"Titulo: {self.title}\n"
+                f"Progressão: {prog_info}\n"
+                f"Acordes: {"-".join(chord_names)}\n"
+                f"Opção correta: {self.correct_answer}\n"
+                f"Opções erradas: {self.wrong_options}\n"
+                f"Explicação: {self.explanation}")
+
 class ExerciseGenerator: #Gerador de exercicios
     scale_difficulty_settings = {"easy": ("Major",), "medium": ("Major", "Minor"), "hard" :("Major", "Minor", "Major Pentatonic", "Minor Pentatonic", "Mixolydian", "Dorian")} #Definições de dificuldade relativas ao tipo de escala
     prog_difficulty_settings = {"easy":("I-V","I-IV","I-vi","ii-V")}
@@ -126,7 +144,20 @@ class ExerciseGenerator: #Gerador de exercicios
                      f"{note_names}\n"
                      f"A nota reproduzida foi {interval_note.name} que corresponde ao {degree} grau da escala")
         return explanation
-        
+
+    def generate_prog_exercise(self, difficulty, generate_options=True):
+        progression = self.generate_prog(difficulty)
+        prog_type_name=progression.prog_type.name
+
+        if generate_options:
+            wrong_options = self.generate_prog_wrong_options(prog_type_name, difficulty)
+        else:
+            wrong_options = []
+
+        explanation = self.generate_prog_explanation(progression)
+
+        return ProgressionExercise(progression, "Reconhecimento de progressões hamónicas", prog_type_name, wrong_options, explanation)
+
     def generate_prog(self, difficulty): #gera uma progressão harmónica de acordo com a dificuldade especificada
         prog_scale=self.generate_scale("easy") #gerar uma escala aleatoria, "easy"-gerar apenas escalas maiores e menores
         prog_type=self.select_prog_type(difficulty) #tendo em conta a dificuldade escolhida, escolher um tipo de progressão
