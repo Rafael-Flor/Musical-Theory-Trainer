@@ -31,6 +31,7 @@ class IntervalScaleExercise(Exercise):
 class ExerciseGenerator: #Gerador de exercicios
     scale_difficulty_settings = {"easy": ("Major",), "medium": ("Major", "Minor"), "hard" :("Major", "Minor", "Major Pentatonic", "Minor Pentatonic", "Mixolydian", "Dorian")} #Definições de dificuldade relativas ao tipo de escala
     prog_difficulty_settings = {"easy":("I-V","I-IV","I-vi","ii-V")}
+    prog_allowed_types = {"medium":("maj7", "7"), "hard":("º","º7")}
     def __init__(self, theory_model):
         self.theory_model=theory_model #Modelo de teoria que o gerador utiliza
 
@@ -156,6 +157,34 @@ class ExerciseGenerator: #Gerador de exercicios
             if chord_prog.name in self.prog_difficulty_settings[difficulty]:
                 possible_progs.append(chord_prog)
         return random.choice(possible_progs)
+
+    def generate_prog_wrong_options(self, prog_name, dificulty): #Gera as opções erradas para os exercícios de progressões
+        degrees=["i","ii","iii","iv","v","vi","vii","I","II","III","IV","V","VI","VII"]
+        medium_types=list(self.prog_allowed_types["medium"]) #obter os tipos de acordes permtidos em cada dificuldade
+        hard_types=list(self.prog_allowed_types["hard"])
+
+        allowed_types=[]
+        if dificulty == "medium":
+            allowed_types=allowed_types+medium_types
+        if dificulty == "hard":
+            allowed_types=allowed_types+hard_types
+
+        chords_degrees=prog_name.split("-")
+        options= set()
+        while len(options) < 3: #Até obter 3 opções de resposta
+            index=random.randrange(len(chords_degrees)) #Escolher um acorde aleatorio do nome da progressão
+            option=list(chords_degrees)
+            option[index]=random.choice(degrees) #Alterar o grau escolhido por outro grau
+            if allowed_types and random.choice([True, False]): #se na dificuldade esolhida forem permitidos outros graus para além dos maiores/menores, pode ser adicionado uma descrição extra ao acorde (por ex. sétima, diminutos)
+                type=random.choice(allowed_types)
+                option[index]=option[index]+type
+                option="-".join(option)
+                options.add(option)
+            else:
+                option = "-".join(option)
+                options.add(option)
+        options=list(options)
+        return options
 
 
 
