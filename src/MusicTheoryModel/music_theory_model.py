@@ -16,14 +16,23 @@ class Scale: #Escala musical
         self.scale_type=scale_type
         self.notes=notes
 
-
+class Chord: #Acorde
+    def __init__(self, tonic, chord_type, notes):
+        self.tonic=tonic
+        self.chord_type=chord_type
+        self.notes=notes
 
 class ScaleType: #Formato genérico para um tipo de escala
     def __init__(self, name, scale_degrees, note_steps):
         self.name=name
         self.scale_degrees = scale_degrees #graus da escala
-        self.note_steps=note_steps #intervalos entre graus da escala em semitons
+        self.note_steps=note_steps #intervalos entre graus da escala, em semitons
 
+class ChordType: #Formato genérico para um tipo de acorde
+    def __init__(self, name, chord_degrees, note_steps):
+        self.name=name
+        self.chord_degrees=chord_degrees
+        self.note_steps=note_steps
 
 class MusicTheoryModel:
     NATURAL_NOTE_NAMES=["C","D","E","F","G","A","B"]
@@ -44,9 +53,9 @@ class MusicTheoryModel:
         Note(9, "A"),
         Note(10, "A#"),
         Note(10, "Bb"),
-        Note(11, "B")) #Tónicas possiveis
+        Note(11, "B"))
     def __init__(self):
-        self.scale_types=[ #Definição dos tipos de escala do modelo
+        self.scale_types=[          #Definição dos tipos de escala do modelo
             ScaleType("Major", [1, 2, 3, 4, 5, 6, 7], [2, 2, 1, 2, 2, 2, 1]),
             ScaleType("Minor", [1, 2, 3, 4, 5, 6, 7], [2, 1, 2, 2, 1, 2, 2]),
             ScaleType("Major Pentatonic", [1, 2, 3, 5, 6], [2, 2, 3, 2]),
@@ -54,5 +63,13 @@ class MusicTheoryModel:
             ScaleType("Mixolydian", [1, 2, 3, 4, 5, 6, 7], [2, 2, 1, 2, 2, 1, 2]),
             ScaleType("Dorian", [1, 2, 3, 4, 5, 6, 7],[2, 1, 2, 2, 2, 1, 2])
         ]
-
-
+        self.chord_types=[          #Definição dos tipos de acordes do modelo
+            ChordType("Major", [1, 3, 5], [4,3]),
+            ChordType("Minor", [1, 3, 5], [3, 4]),
+            ChordType("Major7", [1, 3, 5, 7], [4, 3, 4]),
+            ChordType("Minor7", [1, 3, 5, 7], [3, 4, 3]),
+            ChordType("7", [1, 3, 5, 7], [4,3, 3]),
+            ChordType("Diminished", [1, 3, 5], [3, 3]),
+            ChordType("Diminished7", [1, 3, 5, 7], [3, 3, 3]),
+        ]
+ 
