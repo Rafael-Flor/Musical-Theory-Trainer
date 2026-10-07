@@ -17,7 +17,6 @@ class IntervalScaleExercise(Exercise):
         self.scale=scale
         self.interval_note=interval_note
 
-
     def __str__(self):
         note_names="|".join(note.name for note in self.scale.notes)
         return (f"--------------\n"
@@ -127,7 +126,7 @@ class ExerciseGenerator: #Gerador de exercicios
                      f"{note_names}\n"
                      f"A nota reproduzida foi {interval_note.name} que corresponde ao {degree} grau da escala")
         return explanation
-
+        
     def generate_prog(self, difficulty): #gera uma progressão harmónica de acordo com a dificuldade especificada
         prog_scale=self.generate_scale("easy") #gerar uma escala aleatoria, "easy"-gerar apenas escalas maiores e menores
         prog_type=self.select_prog_type(difficulty) #tendo em conta a dificuldade escolhida, escolher um tipo de progressão
@@ -158,7 +157,7 @@ class ExerciseGenerator: #Gerador de exercicios
                 possible_progs.append(chord_prog)
         return random.choice(possible_progs)
 
-    def generate_prog_wrong_options(self, prog_name, dificulty): #Gera as opções erradas para os exercícios de progressões
+    def generate_prog_wrong_options(self, prog_type_name, dificulty): #Gera as opções erradas para os exercícios de progressões
         degrees=["i","ii","iii","iv","v","vi","vii","I","II","III","IV","V","VI","VII"]
         medium_types=list(self.prog_allowed_types["medium"]) #obter os tipos de acordes permtidos em cada dificuldade
         hard_types=list(self.prog_allowed_types["hard"])
@@ -169,7 +168,7 @@ class ExerciseGenerator: #Gerador de exercicios
         if dificulty == "hard":
             allowed_types=allowed_types+hard_types
 
-        chords_degrees=prog_name.split("-")
+        chords_degrees=prog_type_name.split("-")
         options= set()
         while len(options) < 3: #Até obter 3 opções de resposta
             index=random.randrange(len(chords_degrees)) #Escolher um acorde aleatorio do nome da progressão
@@ -185,6 +184,26 @@ class ExerciseGenerator: #Gerador de exercicios
                 options.add(option)
         options=list(options)
         return options
+
+    def generate_prog_explanation(self, progression): #Constroi a explicação para o exercício de progressão harmónica
+        tonic=progression.scale.tonic.name
+        scale_type=progression.scale.scale_type.name
+        prog_name=progression.prog_type.name
+        prog_type=progression.prog_type
+        degrees_exp=""
+        for i in range(len(prog_type.chord_types)):
+            degrees_exp=degrees_exp+f"Um acorde do tipo {prog_type.chord_types[i]} no {prog_type.prog_degrees[i]}º grau da escala\n"
+        chords_exp=""
+        for chord in progression.prog_chords:
+            chords_exp=chords_exp+f"{chord.tonic.name} {chord.chord_type.name}  "
+
+        explanation=(f"A progressão |{prog_name}| do exercício ocorre na escala de {tonic} {scale_type}\n"
+                     f"Uma progressão |{prog_name}| é contruida a partir de :\n"
+                     f"{degrees_exp}\n"
+                     f"Na escala de {tonic} {scale_type} esses acordes são:\n"
+                     f"{chords_exp}\n")
+
+        return explanation
 
 
 
