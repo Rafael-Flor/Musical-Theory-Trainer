@@ -1,5 +1,5 @@
 
-from PySide6 import QtCore, QtWidgets, QtGui
+from PySide6 import QtCore, QtWidgets
 
 from src.Events import Event
 
@@ -7,7 +7,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
     def __init__(self):
         super().__init__()
 
-        self.pages = QtWidgets.QStackedWidget() #Guarda Páginas/Ecrãs da interface
+        self.pages = QtWidgets.QStackedWidget() #Guarda Páginas(Ecrãs) da interface
 
         #Instanciar páginas da interface
         self.main_menu = MainMenu()
@@ -134,11 +134,9 @@ class ConfigPage(QtWidgets.QWidget): #Página de configuração de exercícios
         self.exercise_configured.emit(selected_exercise,selected_difficulty,selected_exercise_num,selected_mode)
 
 
-class IntervalScaleExPage(QtWidgets.QWidget): #Página para resolução de exercícios de reconhecimento de intervalos em escalas
+class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
     #Criar eventos
     explanation_requested = Event() #Pedir explicação do exercício
-    tonic_playback_requested = Event() #Pedir reprodução da tónica
-    interval_note_playback_requested = Event() #Pedir reprodução da nota do intervalo
     answer_submited = Event() #Resposta foi submetida
 
     def __init__(self):
@@ -150,15 +148,10 @@ class IntervalScaleExPage(QtWidgets.QWidget): #Página para resolução de exerc
         self.layout.setAlignment(QtCore.Qt.AlignTop)
         self.layout.setContentsMargins(0, 50, 0, 0)
 
+        self.title=QtWidgets.QLabel("")
+        self.instructions=QtWidgets.QLabel("")
 
-        self.title=QtWidgets.QLabel("Exercício de reconhecimento de intervalos em escalas")
-        self.scale_info=QtWidgets.QLabel("")
-        self.instructions=QtWidgets.QLabel("Clique nos botões abaixo para reproduzir as notas do exercício")
-        self.tonic_bt = QtWidgets.QPushButton("Reproduzir tónica")
-        self.tonic_bt.clicked.connect(lambda: self.tonic_playback_requested.emit())
-        self.interval_bt = QtWidgets.QPushButton("Reproduzir nota do intervalo")
-        self.interval_bt.clicked.connect(lambda: self.interval_note_playback_requested.emit())
-        self.multiple_choice_txt = QtWidgets.QLabel("Selecione o grau da nota do intervalo:")
+        self.multiple_choice_txt = QtWidgets.QLabel("")
 
         self.feedback=QtWidgets.QLabel("")
 
@@ -175,10 +168,7 @@ class IntervalScaleExPage(QtWidgets.QWidget): #Página para resolução de exerc
         self.continue_bt.clicked.connect(lambda: self.explanation_requested.emit())
 
         self.layout.addWidget(self.title)
-        self.layout.addWidget(self.scale_info)
         self.layout.addWidget(self.instructions)
-        self.layout.addWidget(self.tonic_bt)
-        self.layout.addWidget(self.interval_bt)
         self.layout.addWidget(self.multiple_choice_txt)
 
         self.layout.addWidget(self.op1_bt)
@@ -188,10 +178,6 @@ class IntervalScaleExPage(QtWidgets.QWidget): #Página para resolução de exerc
 
         self.layout.addWidget(self.feedback)
         self.layout.addWidget(self.continue_bt)
-
-
-    def set_current_exercise(self, scale_info): #Atualiza informação da escala
-        self.scale_info.setText(scale_info)
 
     def set_answer_options(self, options): #Atualiza botões das opções de resposta
         self.options=options
@@ -211,7 +197,6 @@ class IntervalScaleExPage(QtWidgets.QWidget): #Página para resolução de exerc
         self.op3_bt.setDisabled(False)
         self.op4_bt.setDisabled(False)
 
-
     def op_bt_clicked(self, option): #Emite opção escolhida e desativa os botões de resposta
         self.answer_submited.emit(option)
         self.op1_bt.setDisabled(True)
@@ -219,7 +204,28 @@ class IntervalScaleExPage(QtWidgets.QWidget): #Página para resolução de exerc
         self.op3_bt.setDisabled(True)
         self.op4_bt.setDisabled(True)
 
+class IntervalScaleExPage(ExPage): #Página para resolução de exercícios de reconhecimento de intervalos em escalas
 
+    tonic_playback_requested = Event()  # Pedir reprodução da tónica
+    interval_note_playback_requested = Event()  # Pedir reprodução da nota do intervalo
+
+    def __init__(self):
+        super().__init__()
+        self.title.setText("Exercício de reconhecimento de intervalos em escalas")
+        self.instructions.setText("Clique nos botões abaixo para reproduzir as notas do exercício")
+        self.multiple_choice_txt.setText("Selecione o grau da nota do intervalo:")
+        self.scale_info = QtWidgets.QLabel("")
+        self.tonic_bt = QtWidgets.QPushButton("Reproduzir tónica")
+        self.tonic_bt.clicked.connect(lambda: self.tonic_playback_requested.emit())
+        self.interval_bt = QtWidgets.QPushButton("Reproduzir nota do intervalo")
+        self.interval_bt.clicked.connect(lambda: self.interval_note_playback_requested.emit())
+
+        self.layout.insertWidget(self.layout.indexOf(self.multiple_choice_txt),self.scale_info)
+        self.layout.insertWidget(self.layout.indexOf(self.instructions)+1,self.tonic_bt)
+        self.layout.insertWidget(self.layout.indexOf(self.tonic_bt)+1,self.interval_bt)
+
+    def set_current_exercise(self, scale_info): #Atualiza informação da escala
+        self.scale_info.setText(scale_info)
 
 class ExplanationPage(QtWidgets.QWidget):
     next_exercise_requested = Event()
@@ -256,7 +262,6 @@ class EvaluationPage(QtWidgets.QWidget): #Página para apresentação da avalia�
         self.continue_bt = QtWidgets.QPushButton("Continuar")
         self.continue_bt.clicked.connect(lambda: self.eval_continue_pressed.emit())
 
-
         self.layout.addWidget(self.correct_stat)
         self.layout.addWidget(self.precision_stat)
         self.layout.addWidget(self.eval_stat)
@@ -266,11 +271,4 @@ class EvaluationPage(QtWidgets.QWidget): #Página para apresentação da avalia�
         self.correct_stat.setText("Respostas corretas: "+str(correct_count))
         self.precision_stat.setText("Precisão: "+str(accuracy))
         self.eval_stat.setText("Avaliação: " + str(evaluation))
-
-
-
-
-
-
-
 
