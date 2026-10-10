@@ -47,7 +47,10 @@ class ProgressionExercise(Exercise):
 
 class ExerciseGenerator: #Gerador de exercicios
     scale_difficulty_settings = {"easy": ("Major",), "medium": ("Major", "Minor"), "hard" :("Major", "Minor", "Major Pentatonic", "Minor Pentatonic", "Mixolydian", "Dorian")} #Definições de dificuldade relativas ao tipo de escala
-    prog_difficulty_settings = {"easy":("I-V","I-IV","I-vi","ii-V")}
+    prog_difficulty_settings = {"easy":("I-V","I-IV","I-vi","ii-V","vi-IV"),
+                                "medium":("Imaj7-vi7","vi7º-ii7","I-iii-IV-iv","I-V-vi-IV","I-vi-ii-V","I-vi-IV-V","vi-IV-I-V","I-vi7-ii7-V7","Imaj7-iii7-IVmaj7-iv7"),
+                                "hard":("viiº-I","iiº-V","I-vi-iiº-V","I-iii-viiº-I")}
+
     prog_allowed_types = {"medium":("maj7", "7"), "hard":("º","º7")}
     def __init__(self, theory_model):
         self.theory_model=theory_model #Modelo de teoria que o gerador utiliza
@@ -159,7 +162,7 @@ class ExerciseGenerator: #Gerador de exercicios
         return ProgressionExercise(progression, "Reconhecimento de progressões hamónicas", prog_type_name, wrong_options, explanation)
 
     def generate_prog(self, difficulty): #gera uma progressão harmónica de acordo com a dificuldade especificada
-        prog_scale=self.generate_scale("easy") #gerar uma escala aleatoria, "easy"-gerar apenas escalas maiores e menores
+        prog_scale=self.generate_scale("easy") #gerar uma escala aleatoria, "easy"-gerar apenas escalas maiores
         prog_type=self.select_prog_type(difficulty) #tendo em conta a dificuldade escolhida, escolher um tipo de progressão
         prog_chords=[]
         for i in range(len(prog_type.chord_types)): #para cada acorde no tipo de progressão
@@ -209,10 +212,12 @@ class ExerciseGenerator: #Gerador de exercicios
                 type=random.choice(allowed_types)
                 option[index]=option[index]+type
                 option="-".join(option)
-                options.add(option)
+                if option != prog_type_name:
+                    options.add(option)
             else:
                 option = "-".join(option)
-                options.add(option)
+                if option != prog_type_name:
+                    options.add(option)
         options=list(options)
         return options
 
