@@ -20,6 +20,7 @@ class Main:
         #Ecrãs da interface
         self.config_screen = self.window.config_page
         self.i_s_screen = self.window.int_scale_exercise_page
+        self.p_screen = self.window.prog_exercise_page
         self.explain_screen = self.window.explanation_page
         self.eval_screen = self.window.evaluation_page
 
@@ -31,6 +32,9 @@ class Main:
         self.i_s_screen.explanation_requested.subscribe(self.show_explanation)
         self.explain_screen.next_exercise_requested.subscribe(self.next_exercise)
         self.eval_screen.eval_continue_pressed.subscribe(self.show_menu)
+        self.p_screen.prog_playback_requested.subscribe(self.play_p_rogression)
+        self.p_screen.answer_submited.subscribe(self.process_p_answer)
+        self.p_screen.explanation_requested.subscribe(self.show_explanation)
 
     def show_menu(self): #Mostra menu de seleção de exercícios
         self.window.show_menu()
@@ -52,12 +56,20 @@ class Main:
         match selected_exercise:
             case "interval_scale":
                 self.show_i_s_exercise()
+            case "harmonic_prog":
+                self.show_p_exercise()
 
     def show_i_s_exercise(self): #Mostra um exercício de reconhecimento de intervalos em escalas na interface
         session = self.exercise_manager.exercise_session
         scale_info = session.current_exercise_scale_info()
         options = session.exercise_answer_options()
         self.window.show_interval_scale_page(scale_info, options)
+
+    def show_p_exercise(self): #Mostra um exercício de reconhecimento de progressões harmonicas na interface
+        session = self.exercise_manager.exercise_session
+        prog_info = session.current_exercise_prog_info()
+        options = session.exercise_answer_options()
+        self.window.show_prog_page(prog_info, options)
 
     def show_explanation(self):
         session = self.exercise_manager.exercise_session
@@ -74,13 +86,27 @@ class Main:
         self.i_s_screen.set_feedback(feedback)
         self.i_s_screen.show_feedback()
 
+    def process_p_answer(self, answer): #valida resposta e mostra feedback
+        session = self.exercise_manager.exercise_session
+        session.validate_answer(answer)
+        if session.answer_is_correct(answer):
+            feedback="Certo!"
+        else:
+            feedback="Errado!"
+        self.p_screen.set_feedback(feedback)
+        self.p_screen.show_feedback()
 
     def play_i_s_tonic(self):
         session = self.exercise_manager.exercise_session
         session.play_exercise_tonic()
+
     def play_i_s_interval_note(self):
         session = self.exercise_manager.exercise_session
         session.play_exercise_interval_note()
+
+    def play_p_rogression(self):
+        session = self.exercise_manager.exercise_session
+        session.play_exercise_prog()
 
     def show_eval(self):
         session = self.exercise_manager.exercise_session
