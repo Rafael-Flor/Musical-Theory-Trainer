@@ -13,6 +13,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.main_menu = MainMenu()
         self.config_page = ConfigPage()
         self.int_scale_exercise_page = IntervalScaleExPage()
+        self.prog_exercise_page= ProgExPage()
         self.explanation_page = ExplanationPage()
         self.evaluation_page = EvaluationPage()
 
@@ -20,6 +21,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.pages.addWidget(self.main_menu)
         self.pages.addWidget(self.config_page)
         self.pages.addWidget(self.int_scale_exercise_page)
+        self.pages.addWidget(self.prog_exercise_page)
         self.pages.addWidget(self.explanation_page)
         self.pages.addWidget(self.evaluation_page)
 
@@ -42,6 +44,12 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.int_scale_exercise_page.set_answer_options(options)
         self.int_scale_exercise_page.enable_options()
         self.pages.setCurrentWidget(self.int_scale_exercise_page)
+
+    def show_prog_page(self, prog_info, options):
+        self.prog_exercise_page.set_current_exercise(prog_info)
+        self.prog_exercise_page.set_answer_options(options)
+        self.prog_exercise_page.enable_options()
+        self.pages.setCurrentWidget(self.prog_exercise_page)
 
     def show_explanation_page(self, explanation):
         self.explanation_page.set_explanation(explanation)
@@ -70,11 +78,16 @@ class MainMenu(QtWidgets.QWidget): #Página do menu principal
         #Criar elementos da página
         self.interval_scale_title = "Exercícios de reconhecimento de intervalos em escalas"
         self.interval_scale_code = "interval_scale"
+        self.prog_title = "Exercícios de reconhecimento de progressões harmónicas"
+        self.prog_code = "harmonic_prog"
         self.interval_scale_bt=QtWidgets.QPushButton(self.interval_scale_title)
         self.interval_scale_bt.clicked.connect(lambda: self.exercise_selected.emit(self.interval_scale_title,self.interval_scale_code)) #Quando clicar no botão emitir o sinal de seleção de exercício
+        self.prog_bt = QtWidgets.QPushButton(self.prog_title)
+        self.prog_bt.clicked.connect(lambda: self.exercise_selected.emit(self.prog_title,self.prog_code))
 
         #Adicionar elementos ao layout da página
         self.layout.addWidget(self.interval_scale_bt)
+        self.layout.addWidget(self.prog_bt)
 
 
 
@@ -227,6 +240,25 @@ class IntervalScaleExPage(ExPage): #Página para resolução de exercícios de r
     def set_current_exercise(self, scale_info): #Atualiza informação da escala
         self.scale_info.setText(scale_info)
 
+class ProgExPage(ExPage): #Página para resolução de exercícios de reconhecimento de progressões harmónicas
+
+    prog_playback_requested = Event()
+
+    def __init__(self):
+        super().__init__()
+        self.title.setText("Exercício de reconhecimento de progressões harmónicas:")
+        self.instructions.setText("Clique nos botões abaixo para reproduzir a progressão do exercício:")
+        self.multiple_choice_txt.setText("Selecione o tipo de progressão reproduzida:")
+        self.prog_info = QtWidgets.QLabel("")
+        self.prog_bt = QtWidgets.QPushButton("Reproduzir progressão")
+        self.prog_bt.clicked.connect(lambda: self.prog_playback_requested.emit())
+
+        self.layout.insertWidget(self.layout.indexOf(self.multiple_choice_txt),self.prog_info)
+        self.layout.insertWidget(self.layout.indexOf(self.instructions)+1,self.prog_bt)
+
+    def set_current_exercise(self, scale_info): #Atualiza informação da progressão
+        self.prog_info.setText(scale_info)
+
 class ExplanationPage(QtWidgets.QWidget):
     next_exercise_requested = Event()
     def __init__(self):
@@ -271,4 +303,11 @@ class EvaluationPage(QtWidgets.QWidget): #Página para apresentação da avalia�
         self.correct_stat.setText("Respostas corretas: "+str(correct_count))
         self.precision_stat.setText("Precisão: "+str(accuracy))
         self.eval_stat.setText("Avaliação: " + str(evaluation))
+
+
+
+
+
+
+
 
