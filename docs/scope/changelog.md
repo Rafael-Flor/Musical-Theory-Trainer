@@ -104,3 +104,23 @@
 
 **Próxima semana:** Implementar: modelo de teoria necessário à geração de progressões harmónicas; Geração de exercícios de reconhecimento de progressões harmónicas; Sessões de exercícios de reconhecimento de progressões; Ecrãs da interface necessários à realização de exercícios de reconhecimento de progressões; Controlo principal da aplicação para os exercícios de progressões harmónicas. 
 
+---
+
+## Sem. 9 · 05 - 11 out
+
+**Feito:** 
+
+- Implementado:
+  - Modelo de acordes
+  - Modelo de progressões
+  - Geração de exercícios de reconhecimento de progressões
+  - Sessões para exercícios de reconhecimento de progressões
+  - Reprodução áudio de acordes e de sequências de acordes
+  - Ecrãs para realizar exercícios de progressões
+  - Controlo principal necessário à realização de exercícios de reconhecimento de progressões
+ 
+**Bloqueou:** Nada
+
+**Próxima semana:** Geração de exercícios de reconhecimento de acordes; Sessões para exercícios de reconhecimento de acordes; Ecrãs para resolução de exercícios de reconhecimento de acordes; Controlo principal da aplicação necessário à resolução de exercícios de acordes; Modelo de ritmos; Reprodução áudio de ritmos.
+
+
