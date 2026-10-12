@@ -1,5 +1,5 @@
 
-from src.MusicTheoryModel.music_theory_model import Scale, Note, Chord, ChordProg
+from src.MusicTheoryModel.music_theory_model import Scale, Note, Chord, ChordProg, ChordProgType
 
 import random
 
@@ -47,9 +47,10 @@ class ProgressionExercise(Exercise):
 
 class ExerciseGenerator: #Gerador de exercicios
     scale_difficulty_settings = {"easy": ("Major",), "medium": ("Major", "Minor"), "hard" :("Major", "Minor", "Major Pentatonic", "Minor Pentatonic", "Mixolydian", "Dorian")} #Definições de dificuldade relativas ao tipo de escala
-    prog_difficulty_settings = {"easy":("I-V","I-IV","I-vi","ii-V","vi-IV"),
-                                "medium":("Imaj7-vi7","vi7º-ii7","I-iii-IV-iv","I-V-vi-IV","I-vi-ii-V","I-vi-IV-V","vi-IV-I-V","I-vi7-ii7-V7","Imaj7-iii7-IVmaj7-iv7"),
-                                "hard":("viiº-I","iiº-V","I-vi-iiº-V","I-iii-viiº-I")}
+    prog_difficulty_settings = {"easy":("MajorDiatonics","MinorDiatonics"),
+                                "medium":("MajorDiatonics","MinorDiatonics","Major7thDiatonics","Minor7thDiatonics"),
+                                "hard":("MajorDiatonics","MinorDiatonics","Major7thDiatonics","Minor7thDiatonics","MajorSus2","MinorSus2","MajorSus4","MinorSus4")}
+    prog_len_difficulty_settings = {"easy":(2,),"medium":(2,3,4),"hard": (4,5,6)}
 
     prog_allowed_types = {"medium":("maj7", "7"), "hard":("º","º7")}
     def __init__(self, theory_model):
@@ -161,21 +162,50 @@ class ExerciseGenerator: #Gerador de exercicios
 
         return ProgressionExercise(progression, "Reconhecimento de progressões hamónicas", prog_type_name, wrong_options, explanation)
 
-    def generate_prog(self, difficulty): #gera uma progressão harmónica de acordo com a dificuldade especificada
-        prog_scale=self.generate_scale("easy") #gerar uma escala aleatoria, "easy"-gerar apenas escalas maiores
-        prog_type=self.select_prog_type(difficulty) #tendo em conta a dificuldade escolhida, escolher um tipo de progressão
+    def generate_prog(self, difficulty): #Gera uma progressão harmónica
+
+        prog_scale = self.generate_scale("medium")  # gerar uma escala aleatoria, "medium"-gerar apenas escalas maiores/menores
+        prog_len=random.choice(self.prog_len_difficulty_settings[difficulty])
+        prog_sets = self.get_prog_sets(prog_scale.scale_type.name, difficulty)
         prog_chords=[]
-        for i in range(len(prog_type.chord_types)): #para cada acorde no tipo de progressão
-            chord_type_name=prog_type.chord_types[i]
-            chord_type=self.get_chord_type(chord_type_name) #obter o tipo do acorde
-            degree=prog_type.prog_degrees[i]
-            chord_tonic_index=prog_scale.scale_type.scale_degrees.index(degree)
-            chord_tonic=prog_scale.notes[chord_tonic_index] #obter a tónica do acorde
+        prog_numerals=[]
+        prog_degrees=[]
+        chord_types=[]
+
+        for i in range(prog_len):
+            prog_set=random.choice(prog_sets) #Escolher um conjunto de graus de progressões
+
+            set_numerals = list(prog_set.chord_types.keys())
+            numeral = random.choice(set_numerals) #Escolher um numeral da progressão
+            prog_numerals.append(numeral) #Adicionar numeral aos numerais da progressão
+
+            chord_type_name = prog_set.chord_types[numeral] #Obter o nome do tipo de acorde
+
+            index = set_numerals.index(numeral)
+            degree = prog_set.chord_degrees[index] #Obter o grau do acorde escolhido
+            degree_index=prog_scale.scale_type.scale_degrees.index(degree)
+            tonic=prog_scale.notes[degree_index] #Obter a tonica do acorde correspondente ao grau da escala
+
+            chord_tonic=Note(tonic.pitch,tonic.name)
+            chord_type = self.get_chord_type(chord_type_name)  # obter o tipo do acorde
             chord_notes=self.generate_notes(chord_tonic,chord_type.chord_degrees,chord_type.note_steps) #Gerar notas do acorde
-            prog_chords.append(Chord(chord_tonic, chord_type,chord_notes))
+            chord=Chord(chord_tonic,chord_type,chord_notes) #Acorde da progressão
+
+            prog_chords.append(chord) #Adicionar acorde à progressão
+            prog_degrees.append(degree) #Adicionar grau à progressão
+            chord_types.append(chord_type.name) #Adicionar tipo de acorde à progressão
+
+        prog_type_name="-".join(prog_numerals) #Obter o nome do tipo de progressão
+        prog_type=ChordProgType(prog_type_name,chord_types,prog_degrees) #Guardar informação sobre o tipo de progressão criado
         return ChordProg(prog_scale,prog_type,prog_chords)
 
-
+    def get_prog_sets(self, mode, difficulty): #Retorna os conjuntos de progressões compativeis com o modo da escala e as definições de dificuldade
+        sets=[]
+        allowed=self.prog_difficulty_settings[difficulty]
+        for prog_set in self.theory_model.prog_degrees:
+            if prog_set.name in allowed and prog_set.mode == mode:
+                sets.append(prog_set)
+        return sets
 
     def get_chord_type(self, type_name): #retorna o tipo de acorde com o nome especificado em argumento
         for chord_type in self.theory_model.chord_types:
@@ -184,30 +214,25 @@ class ExerciseGenerator: #Gerador de exercicios
         else:
             return None
 
-    def select_prog_type(self, difficulty): #escolhe aleatoriamente um tipo de progressão, segundo as definições de dificuldade
-        possible_progs=[]
-        for chord_prog in self.theory_model.chord_prog_types:
-            if chord_prog.name in self.prog_difficulty_settings[difficulty]:
-                possible_progs.append(chord_prog)
-        return random.choice(possible_progs)
-
     def generate_prog_wrong_options(self, prog_type_name, dificulty): #Gera as opções erradas para os exercícios de progressões
         degrees=["i","ii","iii","iv","v","vi","vii","I","II","III","IV","V","VI","VII"]
         medium_types=list(self.prog_allowed_types["medium"]) #obter os tipos de acordes permtidos em cada dificuldade
         hard_types=list(self.prog_allowed_types["hard"])
 
         allowed_types=[]
-        if dificulty == "medium":
+        if any(type in prog_type_name for type in medium_types):
             allowed_types=allowed_types+medium_types
-        if dificulty == "hard":
+        if any(type in prog_type_name for type in hard_types):
             allowed_types=allowed_types+hard_types
 
         chords_degrees=prog_type_name.split("-")
+        #change_num=len(chords_degrees)//2
         options= set()
         while len(options) < 3: #Até obter 3 opções de resposta
             index=random.randrange(len(chords_degrees)) #Escolher um acorde aleatorio do nome da progressão
             option=list(chords_degrees)
             option[index]=random.choice(degrees) #Alterar o grau escolhido por outro grau
+
             if allowed_types and random.choice([True, False]): #se na dificuldade esolhida forem permitidos outros graus para além dos maiores/menores, pode ser adicionado uma descrição extra ao acorde (por ex. sétima, diminutos)
                 type=random.choice(allowed_types)
                 option[index]=option[index]+type
