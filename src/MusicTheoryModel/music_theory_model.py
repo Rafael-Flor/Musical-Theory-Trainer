@@ -82,15 +82,8 @@ class MusicTheoryModel:
             ChordType("Minor7", [1, 3, 5, 7], [3, 4, 3]),
             ChordType("7", [1, 3, 5, 7], [4,3, 3]),
             ChordType("Diminished", [1, 3, 5], [3, 3]),
-            ChordType("Diminished7", [1, 3, 5, 7], [3, 3, 3]),
+            ChordType("Diminished7", [1, 3, 5, 7], [3, 3, 3])
         ]
-        self.chord_prog_types=[     #Definição dos tipos de progressões do modelo
-            ChordProgType("I-V", ("Major","Major"), [1,5]),
-            ChordProgType("I-IV", ("Major", "Major"), [1,4]),
-            ChordProgType("I-vi", ("Major", "Minor"), [1,6]),
-            ChordProgType("ii-V", ("Minor", "Major"), [2,5]),
-            ChordProgType("vi-IV", ("Minor", "Major"), [6,4]),
-            ChordProgType("ii-V7-I", ("Minor", "7", "Major"), [2,5,1]),
-        ]
+ 
 
 
