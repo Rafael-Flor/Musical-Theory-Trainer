@@ -89,9 +89,21 @@ class MusicTheoryModel:
             ChordType("Minor7", [1, 3, 5, 7], [3, 4, 3]),
             ChordType("7", [1, 3, 5, 7], [4,3, 3]),
             ChordType("Diminished", [1, 3, 5], [3, 3]),
-            ChordType("Diminished7", [1, 3, 5, 7], [3, 3, 3])
+            ChordType("Diminished7", [1, 3, 5, 7], [3, 3, 3]),
+            ChordType("Halfdiminished7", [1, 3, 5, 7], [3, 3, 4]),
+            ChordType("Sus2", [1, 2, 5], [2, 5]),
+            ChordType("Sus4", [1, 4, 5], [5, 2]),
         ]
-
+        self.prog_degrees=[     #Definição dos conjuntos de graus para compor progressões harmónicas
+            ProgDegreeSet("MajorDiatonics",{"I": "Major", "ii": "Minor", "iii": "Minor", "IV": "Major", "V": "Major", "vi": "Minor","viiº": "Diminished"},[1,2,3,4,5,6,7],"Major"),
+            ProgDegreeSet("Major7thDiatonics", {"Imaj7": "Major7", "ii7": "Minor7", "iii7": "Minor7", "IVmaj7": "Major7", "V7": "7","vi7": "Minor7", "viiø7": "Halfdiminished7"}, [1,2,3,4,5,6,7],"Major"),
+            ProgDegreeSet("MinorDiatonics",{"i": "Minor", "iiº": "Diminished", "III": "Major", "iv": "Minor", "v": "Minor","VI": "Major", "VII": "Major"}, [1, 2, 3, 4, 5, 6, 7], "Minor"),
+            ProgDegreeSet("Minor7thDiatonics",  {"i7": "Minor7", "iiø7": "Halfdiminished7", "IIImaj7": "Major7", "iv7": "Minor7", "v7": "Minor7","VImaj7": "Major7", "VII7": "7"}, [1, 2, 3, 4, 5, 6, 7], "Minor"),
+            ProgDegreeSet("MajorSus2",{"Isus2": "Sus2", "iisus2": "Sus2", "IVsus2": "Sus2", "Vsus2": "Sus2"}, [1,2,4,5], "Major"),
+            ProgDegreeSet("MajorSus4", {"Isus4": "Sus4", "iisus4": "Sus4", "IVsus4": "Sus4", "Vsus4": "Sus4"},[1, 2, 4, 5], "Major"),
+            ProgDegreeSet("MinorSus2", {"isus2": "Sus2", "iisus2": "Sus2", "ivsus2": "Sus2", "vsus2": "Sus2"}, [1, 2, 4, 5], "Minor"),
+            ProgDegreeSet("MinorSus4", {"isus4": "Sus4", "iisus4": "Sus4", "ivsus4": "Sus4", "vsus4": "Sus4"},[1, 2, 4, 5], "Minor")
+        ]
 
 
 
