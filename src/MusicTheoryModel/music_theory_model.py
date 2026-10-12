@@ -46,6 +46,13 @@ class ChordProgType: #Formato genérico para um tipo de progressão harmónica
         self.chord_types=chord_types
         self.prog_degrees=prog_degrees
 
+class ProgDegreeSet: #Conjunto de graus que podem compor uma progressão harmónica
+    def __init__(self, name, chord_types, chord_degrees, mode):
+        self.name=name
+        self.chord_types=chord_types
+        self.chord_degrees=chord_degrees
+        self.mode=mode
+
 class MusicTheoryModel:
     NATURAL_NOTE_NAMES=["C","D","E","F","G","A","B"]
     TONICS = (
@@ -84,6 +91,7 @@ class MusicTheoryModel:
             ChordType("Diminished", [1, 3, 5], [3, 3]),
             ChordType("Diminished7", [1, 3, 5, 7], [3, 3, 3])
         ]
- 
+
+
 
 
