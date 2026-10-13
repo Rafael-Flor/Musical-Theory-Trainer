@@ -278,6 +278,17 @@ class ExerciseGenerator: #Gerador de exercicios
                 options.add(option)
         return list(options)
 
+    def generate_chord_explanation(self, chord): #Constroi a explicação para o exercicio de acordes
+        tonic=chord.tonic.name
+        chord_type=chord.chord_type.name
+        intervals = "|".join( str(interval) for interval in chord.chord_type.note_steps)
+        note_names = "|".join(note.name for note in chord.notes)
+        explanation=(f"O acorde do exercício é {tonic} {chord_type}\n"
+                     f"Uma acorde {chord_type} é construido aplicando a seguinte série de intervalos a partir da tónica:\n"
+                     f"{intervals}\n"
+                     f"Para a tónica {tonic} a aplicação dos intervalos resulta na obtenção das notas do acorde:\n"
+                     f"{note_names}\n")
+        return explanation
 
 
 
