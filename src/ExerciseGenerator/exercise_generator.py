@@ -267,6 +267,17 @@ class ExerciseGenerator: #Gerador de exercicios
                 possible_chords.append(chord_type)
         return random.choice(possible_chords)
 
+    def generate_chord_wrong_options(self, chord, difficulty): #Gera as opcões de resposta para os exercicios de acordes
+        chord_type=chord.chord_type.name
+        allowed_types=self.chord_difficulty_settings[difficulty]
+        option_num=min(len(allowed_types)-1, 3)
+        options= set()
+        while len(options) < option_num:
+            option=random.choice(allowed_types)
+            if option != chord_type:
+                options.add(option)
+        return list(options)
+
 
 
 
