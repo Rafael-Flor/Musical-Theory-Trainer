@@ -52,7 +52,6 @@ class ExerciseGenerator: #Gerador de exercicios
                                 "hard":("MajorDiatonics","MinorDiatonics","Major7thDiatonics","Minor7thDiatonics","MajorSus2","MinorSus2","MajorSus4","MinorSus4")}
     prog_len_difficulty_settings = {"easy":(2,),"medium":(2,3,4),"hard": (4,5,6)}
 
-    prog_allowed_types = {"medium":("maj7", "7"), "hard":("º","º7")}
     def __init__(self, theory_model):
         self.theory_model=theory_model #Modelo de teoria que o gerador utiliza
 
@@ -154,7 +153,7 @@ class ExerciseGenerator: #Gerador de exercicios
         prog_type_name=progression.prog_type.name
 
         if generate_options:
-            wrong_options = self.generate_prog_wrong_options(prog_type_name, difficulty)
+            wrong_options = self.generate_prog_wrong_options(progression, difficulty)
         else:
             wrong_options = []
 
@@ -214,37 +213,24 @@ class ExerciseGenerator: #Gerador de exercicios
         else:
             return None
 
-    def generate_prog_wrong_options(self, prog_type_name, dificulty): #Gera as opções erradas para os exercícios de progressões
-        degrees=["i","ii","iii","iv","v","vi","vii","I","II","III","IV","V","VI","VII"]
-        medium_types=list(self.prog_allowed_types["medium"]) #obter os tipos de acordes permtidos em cada dificuldade
-        hard_types=list(self.prog_allowed_types["hard"])
+    def generate_prog_wrong_options(self, progression, difficulty):  # Gera as opções erradas para os exercícios de progressões
+        prog_mode=progression.scale.scale_type.name #Obter modo da progressão do exercício
+        prog_type_name=progression.prog_type.name
+        prog_sets = self.get_prog_sets(prog_mode, difficulty) #Obter conjuntos de graus de progressões compatives como o modo e dificuldade
+        prog_len = len(progression.prog_chords)
+        options = set()
+        while len(options) < 3:
+            prog_numerals = []
+            for i in range(prog_len):
+                prog_set=random.choice(prog_sets) #Escolher um conjunto de graus de progressões
+                set_numerals = list(prog_set.chord_types.keys())
+                numeral = random.choice(set_numerals) #Escolher um numeral da progressão
+                prog_numerals.append(numeral) #Adicionar numeral aos numerais da progressão
+            prog_numerals="-".join(prog_numerals)
+            if prog_numerals != prog_type_name: #verificar se os numerais são diferentes da progressão do exercício (resposta correta)
+                options.add(prog_numerals)
 
-        allowed_types=[]
-        if any(type in prog_type_name for type in medium_types):
-            allowed_types=allowed_types+medium_types
-        if any(type in prog_type_name for type in hard_types):
-            allowed_types=allowed_types+hard_types
-
-        chords_degrees=prog_type_name.split("-")
-        #change_num=len(chords_degrees)//2
-        options= set()
-        while len(options) < 3: #Até obter 3 opções de resposta
-            index=random.randrange(len(chords_degrees)) #Escolher um acorde aleatorio do nome da progressão
-            option=list(chords_degrees)
-            option[index]=random.choice(degrees) #Alterar o grau escolhido por outro grau
-
-            if allowed_types and random.choice([True, False]): #se na dificuldade esolhida forem permitidos outros graus para além dos maiores/menores, pode ser adicionado uma descrição extra ao acorde (por ex. sétima, diminutos)
-                type=random.choice(allowed_types)
-                option[index]=option[index]+type
-                option="-".join(option)
-                if option != prog_type_name:
-                    options.add(option)
-            else:
-                option = "-".join(option)
-                if option != prog_type_name:
-                    options.add(option)
-        options=list(options)
-        return options
+        return list(options)
 
     def generate_prog_explanation(self, progression): #Constroi a explicação para o exercício de progressão harmónica
         tonic=progression.scale.tonic.name
