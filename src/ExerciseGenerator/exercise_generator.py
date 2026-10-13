@@ -45,6 +45,24 @@ class ProgressionExercise(Exercise):
                 f"Opções erradas: {self.wrong_options}\n"
                 f"Explicação: {self.explanation}")
 
+class ChordExercise(Exercise):
+    def __init__(self, chord, title, correct_answer, wrong_answers, explanation):
+        super().__init__(title, correct_answer, wrong_answers, explanation)
+        self.chord=chord
+
+    def __str__(self):
+        note_names=[]
+        for note in self.chord.notes:
+            note_names.append(note.name)
+        chord_info=f"{self.chord.tonic.name} {self.chord.chord_type.name}\n"
+        return (f"--------------\n"
+                f"Titulo: {self.title}\n"
+                f"Acorde: {chord_info}\n"
+                f"Notas: {"-".join(note_names)}\n"
+                f"Opção correta: {self.correct_answer}\n"
+                f"Opções erradas: {self.wrong_options}\n"
+                f"Explicação: {self.explanation}")
+
 class ExerciseGenerator: #Gerador de exercicios
     scale_difficulty_settings = {"easy": ("Major",), "medium": ("Major", "Minor"), "hard" :("Major", "Minor", "Major Pentatonic", "Minor Pentatonic", "Mixolydian", "Dorian")} #Definições de dificuldade relativas ao tipo de escala
     prog_difficulty_settings = {"easy":("MajorDiatonics","MinorDiatonics"),
@@ -252,6 +270,19 @@ class ExerciseGenerator: #Gerador de exercicios
                      f"{chords_exp}\n")
 
         return explanation
+
+    def generate_chord_exercise(self, difficulty, generate_options=True):
+        chord = self.generate_chord(difficulty)
+        chord_type_name=chord.chord_type.name
+
+        if generate_options:
+            wrong_options = self.generate_chord_wrong_options(chord, difficulty)
+        else:
+            wrong_options = []
+
+        explanation = self.generate_chord_explanation(chord)
+
+        return ChordExercise(chord, "Reconhecimento de acordes", chord_type_name, wrong_options, explanation)
 
     def generate_chord(self, difficulty):
         tonic = random.choice(self.theory_model.TONICS)  # Escolher uma nota aleatoria para ser a tónica do acorde
