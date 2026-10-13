@@ -15,8 +15,6 @@ class ExerciseSession: #Sessão para realização de um conjunto de exercícios
         self.accuracy=0 #Precisão nas respostas do conjunto de exercícios
         self.evaluation="" #Nota qualificativa do desempenho
 
-
-
     def current_exercise(self): #Retorna o exercício atual
         return self.exercises[self.current_index]
 
@@ -88,7 +86,7 @@ class IntervalScaleSession(ExerciseSession): #Sessão para realização de um co
         exercise=self.exercises[self.current_index]
         return f"Escala {exercise.scale.tonic.name} {exercise.scale.scale_type.name}"
 
-class ProgressionScaleSession(ExerciseSession): #Sessão para realização de exercícios de progressões
+class ProgressionSession(ExerciseSession): #Sessão para realização de exercícios de progressões
     def __init__(self,exercises, audio_engine):
         super().__init__(exercises, audio_engine)
         self.exercise_type="harmonic_prog"
@@ -101,6 +99,20 @@ class ProgressionScaleSession(ExerciseSession): #Sessão para realização de ex
         exercise=self.current_exercise()
         prog=exercise.progression
         return f"Tonalidade {prog.scale.tonic.name} {prog.scale.scale_type.name}"
+
+class ChordSession(ExerciseSession): #Sessão para realização de exercícios de acordes
+    def __init__(self,exercises, audio_engine):
+        super().__init__(exercises, audio_engine)
+        self.exercise_type="chord"
+
+    def play_exercise_chord(self): #Reproduz o acorde do exercício
+        chord=self.current_exercise().chord
+        self.audio_engine.play_chord_sequence(chord,2,3)
+
+    def current_exercise_chord_info(self): #Obtem informação sobre o acorde (tonica)
+        exercise=self.current_exercise()
+        chord=exercise.chord
+        return f"Tónica {chord.tonic.name}"
 
 
 
@@ -126,6 +138,10 @@ class ExerciseManager: #Gestor de exercícios
             case "harmonic_prog":
                 for i in range(selected_exercise_num):
                     exercises.append(generator.generate_prog_exercise(selected_difficulty, generate_options))
-                self.exercise_session=ProgressionScaleSession(exercises, self.audio_engine)
+                self.exercise_session=ProgressionSession(exercises, self.audio_engine)
+            case "chord":
+                for i in range(selected_exercise_num):
+                    exercises.append(generator.generate_chord_exercise(selected_difficulty, generate_options))
+                self.exercise_session = ChordSession(exercises, self.audio_engine)
 
 
