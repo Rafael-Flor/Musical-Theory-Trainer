@@ -107,7 +107,7 @@ class ChordSession(ExerciseSession): #Sessão para realização de exercícios d
 
     def play_exercise_chord(self): #Reproduz o acorde do exercício
         chord=self.current_exercise().chord
-        self.audio_engine.play_chord_sequence(chord,2,3)
+        self.audio_engine.play_chord(chord,2,3)
 
     def current_exercise_chord_info(self): #Obtem informação sobre o acorde (tonica)
         exercise=self.current_exercise()
