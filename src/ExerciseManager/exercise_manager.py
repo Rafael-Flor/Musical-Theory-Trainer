@@ -1,6 +1,7 @@
 import random
 
 from src.AudioEngine.audio_engine import AudioEngine
+from src.Events import Event
 from src.ExerciseGenerator.exercise_generator import ExerciseGenerator
 from src.MusicTheoryModel.music_theory_model import MusicTheoryModel
 
@@ -13,6 +14,8 @@ class ExerciseSession: #Sessão para realização de um conjunto de exercícios
         self.correct_count=0 #Contagem de respostas respondidas corretamente
         self.accuracy=0 #Precisão nas respostas do conjunto de exercícios
         self.evaluation="" #Nota qualificativa do desempenho
+
+
 
     def current_exercise(self): #Retorna o exercício atual
         return self.exercises[self.current_index]
@@ -66,7 +69,6 @@ class IntervalScaleSession(ExerciseSession): #Sessão para realização de um co
         super().__init__(exercises, audio_engine)
         self.exercise_type = "interval_scale"
 
-
     def play_exercise_tonic(self): #Reproduzir a tónica do exercício
 
         note=self.exercises[self.current_index].scale.tonic
@@ -86,6 +88,19 @@ class IntervalScaleSession(ExerciseSession): #Sessão para realização de um co
         exercise=self.exercises[self.current_index]
         return f"Escala {exercise.scale.tonic.name} {exercise.scale.scale_type.name}"
 
+class ProgressionScaleSession(ExerciseSession): #Sessão para realização de exercícios de progressões
+    def __init__(self,exercises, audio_engine):
+        super().__init__(exercises, audio_engine)
+        self.exercise_type="harmonic_prog"
+
+    def play_exercise_prog(self): #Reproduz a progressão do exercício
+        chords=self.current_exercise().progression.prog_chords
+        self.audio_engine.play_chord_sequence(chords,2,3)
+
+    def current_exercise_prog_info(self): #Obtem informação sobre a progressão (tonalidade)
+        exercise=self.current_exercise()
+        prog=exercise.progression
+        return f"Tonalidade {prog.scale.tonic.name} {prog.scale.scale_type.name}"
 
 
 
@@ -108,5 +123,9 @@ class ExerciseManager: #Gestor de exercícios
                 for i in range(selected_exercise_num): #Gerar o número de exercícios pretendidos de acordo com as configurações selecionada
                     exercises.append(generator.generate_scale_interval_exercise(selected_difficulty,generate_options))
                 self.exercise_session=IntervalScaleSession(exercises, self.audio_engine) #Criar sessão com os exercícios gerados
+            case "harmonic_prog":
+                for i in range(selected_exercise_num):
+                    exercises.append(generator.generate_prog_exercise(selected_difficulty, generate_options))
+                self.exercise_session=ProgressionScaleSession(exercises, self.audio_engine)
 
 
