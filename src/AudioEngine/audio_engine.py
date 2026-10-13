@@ -46,4 +46,26 @@ class AudioEngine:
             self.synth.noteoff(0, note.pitch + 12 * octave_shift)
             time.sleep(0.5)
 
+    def play_chord(self, chord, duration, octave_shift): #Inicia um thread pra reprodução de um acorde
+        if self.is_playing(): return
+        self.play_thread = threading.Thread(target=self._play_chord, args=(chord, duration, octave_shift),daemon=True)
+        self.play_thread.start()
+
+    def _play_chord(self, chord, duration, octave_shift): #Reproduz um acorde
+        for note in chord.notes:
+            self.synth.noteon(0, note.pitch + 12 * octave_shift, 60)
+        time.sleep(duration)
+        for note in chord.notes:
+            self.synth.noteoff(0, note.pitch + 12 * octave_shift)
+        time.sleep(0.2)
+
+    def play_chord_sequence(self,chords, chord_duration, octave_shift=0): #Inicia um thread para reprodução de uma sequência de acordes
+        if self.is_playing(): return
+        self.play_thread = threading.Thread(target=self._play_chord_sequence, args=(chords, chord_duration, octave_shift),daemon=True)
+        self.play_thread.start()
+
+    def _play_chord_sequence(self, chords, chord_duration, octave_shift=0): #Reproduz uma sequência de acordes
+        for chord in chords:
+            self._play_chord(chord, chord_duration, octave_shift)
+
 
