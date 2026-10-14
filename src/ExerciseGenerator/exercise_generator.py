@@ -45,12 +45,31 @@ class ProgressionExercise(Exercise):
                 f"Opções erradas: {self.wrong_options}\n"
                 f"Explicação: {self.explanation}")
 
+class ChordExercise(Exercise):
+    def __init__(self, chord, title, correct_answer, wrong_answers, explanation):
+        super().__init__(title, correct_answer, wrong_answers, explanation)
+        self.chord=chord
+
+    def __str__(self):
+        note_names=[]
+        for note in self.chord.notes:
+            note_names.append(note.name)
+        chord_info=f"{self.chord.tonic.name} {self.chord.chord_type.name}\n"
+        return (f"--------------\n"
+                f"Titulo: {self.title}\n"
+                f"Acorde: {chord_info}\n"
+                f"Notas: {"-".join(note_names)}\n"
+                f"Opção correta: {self.correct_answer}\n"
+                f"Opções erradas: {self.wrong_options}\n"
+                f"Explicação: {self.explanation}")
+
 class ExerciseGenerator: #Gerador de exercicios
     scale_difficulty_settings = {"easy": ("Major",), "medium": ("Major", "Minor"), "hard" :("Major", "Minor", "Major Pentatonic", "Minor Pentatonic", "Mixolydian", "Dorian")} #Definições de dificuldade relativas ao tipo de escala
     prog_difficulty_settings = {"easy":("MajorDiatonics","MinorDiatonics"),
                                 "medium":("MajorDiatonics","MinorDiatonics","Major7thDiatonics","Minor7thDiatonics"),
                                 "hard":("MajorDiatonics","MinorDiatonics","Major7thDiatonics","Minor7thDiatonics","MajorSus2","MinorSus2","MajorSus4","MinorSus4")}
     prog_len_difficulty_settings = {"easy":(2,),"medium":(2,3,4),"hard": (4,5,6)}
+    chord_difficulty_settings ={"easy":("Major","Minor"), "medium":("Major","Minor","Major7","Minor7","7"),"hard":("Major","Minor","Major7","Minor7","7","Diminished","Diminished7","Halfdiminished7","Sus2","Sus4")}
 
     def __init__(self, theory_model):
         self.theory_model=theory_model #Modelo de teoria que o gerador utiliza
@@ -75,7 +94,7 @@ class ExerciseGenerator: #Gerador de exercicios
         scale_tonic = Note(tonic.pitch, tonic.name)
         scale_type = self.select_scale_type(difficulty) #Tendo em conta as definições de dificuldade, esolher aleatoriamente um tipo de escala
         notes = self.generate_notes(scale_tonic, scale_type.scale_degrees, scale_type.note_steps) #gerar notas da escala
-        return Scale(tonic, scale_type, notes)
+        return Scale(scale_tonic, scale_type, notes)
 
     def generate_notes(self, tonic, degrees, steps): #Gera notas musicais utilizando a descirção dos graus e de intervalos entre notas
         notes = []
@@ -250,6 +269,56 @@ class ExerciseGenerator: #Gerador de exercicios
                      f"Na escala de {tonic} {scale_type} esses acordes são:\n"
                      f"{chords_exp}\n")
 
+        return explanation
+
+    def generate_chord_exercise(self, difficulty, generate_options=True):
+        chord = self.generate_chord(difficulty)
+        chord_type_name=chord.chord_type.name
+
+        if generate_options:
+            wrong_options = self.generate_chord_wrong_options(chord, difficulty)
+        else:
+            wrong_options = []
+
+        explanation = self.generate_chord_explanation(chord)
+
+        return ChordExercise(chord, "Reconhecimento de acordes", chord_type_name, wrong_options, explanation)
+
+    def generate_chord(self, difficulty):
+        tonic = random.choice(self.theory_model.TONICS)  # Escolher uma nota aleatoria para ser a tónica do acorde
+        chord_tonic = Note(tonic.pitch, tonic.name)
+        chord_type = self.select_chord_type(difficulty)  # Tendo em conta as definições de dificuldade, esolher aleatoriamente um tipo de acorde
+        notes = self.generate_notes(chord_tonic, chord_type.chord_degrees, chord_type.note_steps)  # gerar notas do acorde
+        return Chord(chord_tonic, chord_type, notes)
+
+    def select_chord_type(self, difficulty): #Retorna um tipo de acorde aleatorio considerando as configurações de dificuldade
+        possible_chords=[]
+        for chord_type in self.theory_model.chord_types:
+            if chord_type.name in self.chord_difficulty_settings[difficulty]:
+                possible_chords.append(chord_type)
+        return random.choice(possible_chords)
+
+    def generate_chord_wrong_options(self, chord, difficulty): #Gera as opcões de resposta para os exercicios de acordes
+        chord_type=chord.chord_type.name
+        allowed_types=self.chord_difficulty_settings[difficulty]
+        option_num=min(len(allowed_types)-1, 3)
+        options= set()
+        while len(options) < option_num:
+            option=random.choice(allowed_types)
+            if option != chord_type:
+                options.add(option)
+        return list(options)
+
+    def generate_chord_explanation(self, chord): #Constroi a explicação para o exercicio de acordes
+        tonic=chord.tonic.name
+        chord_type=chord.chord_type.name
+        intervals = "|".join( str(interval) for interval in chord.chord_type.note_steps)
+        note_names = "|".join(note.name for note in chord.notes)
+        explanation=(f"O acorde do exercício é {tonic} {chord_type}\n"
+                     f"Uma acorde {chord_type} é construido aplicando a seguinte série de intervalos a partir da tónica:\n"
+                     f"{intervals}\n"
+                     f"Para a tónica {tonic} a aplicação dos intervalos resulta na obtenção das notas do acorde:\n"
+                     f"{note_names}\n")
         return explanation
 
 
