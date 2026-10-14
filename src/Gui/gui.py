@@ -15,6 +15,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.config_page = ConfigPage()
         self.int_scale_exercise_page = IntervalScaleExPage()
         self.prog_exercise_page= ProgExPage()
+        self.chord_exercise_page=ChordExPage()
         self.explanation_page = ExplanationPage()
         self.evaluation_page = EvaluationPage()
 
@@ -23,6 +24,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.pages.addWidget(self.config_page)
         self.pages.addWidget(self.int_scale_exercise_page)
         self.pages.addWidget(self.prog_exercise_page)
+        self.pages.addWidget(self.chord_exercise_page)
         self.pages.addWidget(self.explanation_page)
         self.pages.addWidget(self.evaluation_page)
 
@@ -51,6 +53,12 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.prog_exercise_page.multiple_choice.set_answer_options(options)
         self.prog_exercise_page.multiple_choice.enable_options()
         self.pages.setCurrentWidget(self.prog_exercise_page)
+
+    def show_chord_page(self, chord_info, options):
+        self.chord_exercise_page.set_current_exercise(chord_info)
+        self.chord_exercise_page.multiple_choice.set_answer_options(options)
+        self.chord_exercise_page.multiple_choice.enable_options()
+        self.pages.setCurrentWidget(self.chord_exercise_page)
 
     def show_explanation_page(self, explanation):
         self.explanation_page.set_explanation(explanation)
@@ -81,14 +89,19 @@ class MainMenu(QtWidgets.QWidget): #Página do menu principal
         self.interval_scale_code = "interval_scale"
         self.prog_title = "Exercícios de reconhecimento de progressões harmónicas"
         self.prog_code = "harmonic_prog"
+        self.chord_title = "Exercício de reconhecimento de acordes"
+        self.chord_code = "chord"
         self.interval_scale_bt=QtWidgets.QPushButton(self.interval_scale_title)
         self.interval_scale_bt.clicked.connect(lambda: self.exercise_selected.emit(self.interval_scale_title,self.interval_scale_code)) #Quando clicar no botão emitir o sinal de seleção de exercício
         self.prog_bt = QtWidgets.QPushButton(self.prog_title)
         self.prog_bt.clicked.connect(lambda: self.exercise_selected.emit(self.prog_title,self.prog_code))
+        self.chord_bt = QtWidgets.QPushButton(self.chord_title)
+        self.chord_bt.clicked.connect(lambda: self.exercise_selected.emit(self.chord_title, self.chord_code))
 
         #Adicionar elementos ao layout da página
         self.layout.addWidget(self.interval_scale_bt)
         self.layout.addWidget(self.prog_bt)
+        self.layout.addWidget(self.chord_bt)
 
 
 
@@ -254,6 +267,26 @@ class ProgExPage(ExPage): #Página para resolução de exercícios de reconhecim
 
     def set_current_exercise(self, scale_info): #Atualiza informação da progressão
         self.prog_info.setText(scale_info)
+
+class ChordExPage(ExPage): #Página para resolução de exercícios de reconhecimento de acordes
+
+    chord_playback_requested = Event()
+
+    def __init__(self):
+        super().__init__()
+        self.title.setText("Exercício de reconhecimento de acordes:")
+        self.instructions.setText("Clique no botão abaixo para reproduzir o acorde do exercício:")
+        self.multiple_choice_txt.setText("Selecione o tipo de acorde reproduzido:")
+        self.chord_info = QtWidgets.QLabel("")
+        self.chord_bt = QtWidgets.QPushButton("Reproduzir Acorde")
+        self.chord_bt.clicked.connect(lambda: self.chord_playback_requested.emit())
+
+        self.layout.insertWidget(self.layout.indexOf(self.multiple_choice_txt),self.chord_info)
+        self.layout.insertWidget(self.layout.indexOf(self.instructions)+1,self.chord_bt)
+
+    def set_current_exercise(self, chord_info): #Atualiza informação do acorde
+        self.chord_info.setText(chord_info)
+
 
 class ExplanationPage(QtWidgets.QWidget):
     next_exercise_requested = Event()
