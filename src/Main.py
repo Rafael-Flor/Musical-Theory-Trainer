@@ -21,6 +21,7 @@ class Main:
         self.config_screen = self.window.config_page
         self.i_s_screen = self.window.int_scale_exercise_page
         self.p_screen = self.window.prog_exercise_page
+        self.c_screen = self.window.chord_exercise_page
         self.explain_screen = self.window.explanation_page
         self.eval_screen = self.window.evaluation_page
 
@@ -28,13 +29,16 @@ class Main:
         self.config_screen.exercise_configured.subscribe(self.start_exercises)
         self.i_s_screen.tonic_playback_requested.subscribe(self.play_i_s_tonic)
         self.i_s_screen.interval_note_playback_requested.subscribe(self.play_i_s_interval_note)
-        self.i_s_screen.answer_submited.subscribe(self.process_i_s_answer)
+        self.i_s_screen.multiple_choice.answer_submited.subscribe(self.process_i_s_answer)
         self.i_s_screen.explanation_requested.subscribe(self.show_explanation)
         self.explain_screen.next_exercise_requested.subscribe(self.next_exercise)
         self.eval_screen.eval_continue_pressed.subscribe(self.show_menu)
         self.p_screen.prog_playback_requested.subscribe(self.play_p_rogression)
-        self.p_screen.answer_submited.subscribe(self.process_p_answer)
+        self.p_screen.multiple_choice.answer_submited.subscribe(self.process_p_answer)
         self.p_screen.explanation_requested.subscribe(self.show_explanation)
+        self.c_screen.chord_playback_requested.subscribe(self.play_c_chord)
+        self.c_screen.multiple_choice.answer_submited.subscribe(self.process_c_answer)
+        self.c_screen.explanation_requested.subscribe(self.show_explanation)
 
     def show_menu(self): #Mostra menu de seleção de exercícios
         self.window.show_menu()
@@ -58,6 +62,8 @@ class Main:
                 self.show_i_s_exercise()
             case "harmonic_prog":
                 self.show_p_exercise()
+            case "chord":
+                self.show_c_exercise()
 
     def show_i_s_exercise(self): #Mostra um exercício de reconhecimento de intervalos em escalas na interface
         session = self.exercise_manager.exercise_session
@@ -70,6 +76,12 @@ class Main:
         prog_info = session.current_exercise_prog_info()
         options = session.exercise_answer_options()
         self.window.show_prog_page(prog_info, options)
+
+    def show_c_exercise(self):  # Mostra um exercício de reconhecimento de acordes na interface
+        session = self.exercise_manager.exercise_session
+        chord_info = session.current_exercise_chord_info()
+        options = session.exercise_answer_options()
+        self.window.show_chord_page(chord_info, options)
 
     def show_explanation(self):
         session = self.exercise_manager.exercise_session
@@ -96,6 +108,16 @@ class Main:
         self.p_screen.set_feedback(feedback)
         self.p_screen.show_feedback()
 
+    def process_c_answer(self, answer): #valida resposta e mostra feedback
+        session = self.exercise_manager.exercise_session
+        session.validate_answer(answer)
+        if session.answer_is_correct(answer):
+            feedback="Certo!"
+        else:
+            feedback="Errado!"
+        self.c_screen.set_feedback(feedback)
+        self.c_screen.show_feedback()
+
     def play_i_s_tonic(self):
         session = self.exercise_manager.exercise_session
         session.play_exercise_tonic()
@@ -107,6 +129,10 @@ class Main:
     def play_p_rogression(self):
         session = self.exercise_manager.exercise_session
         session.play_exercise_prog()
+
+    def play_c_chord(self):
+        session = self.exercise_manager.exercise_session
+        session.play_exercise_chord()
 
     def show_eval(self):
         session = self.exercise_manager.exercise_session
