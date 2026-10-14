@@ -1,5 +1,6 @@
 
 from PySide6 import QtCore, QtWidgets
+from PySide6.QtWidgets import QHBoxLayout
 
 from src.Events import Event
 
@@ -41,14 +42,14 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
 
     def show_interval_scale_page(self, scale_info, options):
         self.int_scale_exercise_page.set_current_exercise(scale_info)
-        self.int_scale_exercise_page.set_answer_options(options)
-        self.int_scale_exercise_page.enable_options()
+        self.int_scale_exercise_page.multiple_choice.set_answer_options(options)
+        self.int_scale_exercise_page.multiple_choice.enable_options()
         self.pages.setCurrentWidget(self.int_scale_exercise_page)
 
     def show_prog_page(self, prog_info, options):
         self.prog_exercise_page.set_current_exercise(prog_info)
-        self.prog_exercise_page.set_answer_options(options)
-        self.prog_exercise_page.enable_options()
+        self.prog_exercise_page.multiple_choice.set_answer_options(options)
+        self.prog_exercise_page.multiple_choice.enable_options()
         self.pages.setCurrentWidget(self.prog_exercise_page)
 
     def show_explanation_page(self, explanation):
@@ -150,12 +151,8 @@ class ConfigPage(QtWidgets.QWidget): #Página de configuração de exercícios
 class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
     #Criar eventos
     explanation_requested = Event() #Pedir explicação do exercício
-    answer_submited = Event() #Resposta foi submetida
-
     def __init__(self):
         super().__init__()
-
-        self.options=None
 
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.setAlignment(QtCore.Qt.AlignTop)
@@ -165,17 +162,9 @@ class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
         self.instructions=QtWidgets.QLabel("")
 
         self.multiple_choice_txt = QtWidgets.QLabel("")
+        self.multiple_choice=MultipleChoice()
 
         self.feedback=QtWidgets.QLabel("")
-
-        self.op1_bt = QtWidgets.QPushButton("")
-        self.op1_bt.clicked.connect(lambda: self.op_bt_clicked(self.options[0]))
-        self.op2_bt = QtWidgets.QPushButton("")
-        self.op2_bt.clicked.connect(lambda: self.op_bt_clicked(self.options[1]))
-        self.op3_bt = QtWidgets.QPushButton("")
-        self.op3_bt.clicked.connect(lambda: self.op_bt_clicked(self.options[2]))
-        self.op4_bt = QtWidgets.QPushButton("")
-        self.op4_bt.clicked.connect(lambda: self.op_bt_clicked(self.options[3]))
 
         self.continue_bt=QtWidgets.QPushButton("Continuar")
         self.continue_bt.clicked.connect(lambda: self.explanation_requested.emit())
@@ -183,39 +172,46 @@ class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
         self.layout.addWidget(self.title)
         self.layout.addWidget(self.instructions)
         self.layout.addWidget(self.multiple_choice_txt)
-
-        self.layout.addWidget(self.op1_bt)
-        self.layout.addWidget(self.op2_bt)
-        self.layout.addWidget(self.op3_bt)
-        self.layout.addWidget(self.op4_bt)
-
+        self.layout.addWidget(self.multiple_choice)
         self.layout.addWidget(self.feedback)
         self.layout.addWidget(self.continue_bt)
-
-    def set_answer_options(self, options): #Atualiza botões das opções de resposta
-        self.options=options
-        self.op1_bt.setText(str(options[0]))
-        self.op2_bt.setText(str(options[1]))
-        self.op3_bt.setText(str(options[2]))
-        self.op4_bt.setText(str(options[3]))
 
     def set_feedback(self, feedback): #Atualiza o feedback da resposta
         self.feedback.setText(feedback)
     def show_feedback(self): #Mostra o feedback da resposta
         self.feedback.show()
 
+
+
+class MultipleChoice(QtWidgets.QWidget):
+    answer_submited = Event() #Resposta foi submetida
+    def __init__(self):
+        super().__init__()
+
+        self.buttons = []
+
+        self.layout = QHBoxLayout(self)
+
+    def set_answer_options(self, options):
+        for button in self.buttons:
+            self.layout.removeWidget(button)
+            button.deleteLater()
+        self.buttons = []
+        for option in options:
+            button = QtWidgets.QPushButton(str(option))
+            button.clicked.connect(lambda checked=False, op=option: self.op_bt_clicked(op))
+            self.buttons.append(button)
+            self.layout.addWidget(button)
+
     def enable_options(self): #Ativa opções de resposta
-        self.op1_bt.setDisabled(False)
-        self.op2_bt.setDisabled(False)
-        self.op3_bt.setDisabled(False)
-        self.op4_bt.setDisabled(False)
+        for button in self.buttons:
+            button.setEnabled(True)
 
     def op_bt_clicked(self, option): #Emite opção escolhida e desativa os botões de resposta
         self.answer_submited.emit(option)
-        self.op1_bt.setDisabled(True)
-        self.op2_bt.setDisabled(True)
-        self.op3_bt.setDisabled(True)
-        self.op4_bt.setDisabled(True)
+        for button in self.buttons:
+            button.setDisabled(True)
+
 
 class IntervalScaleExPage(ExPage): #Página para resolução de exercícios de reconhecimento de intervalos em escalas
 
