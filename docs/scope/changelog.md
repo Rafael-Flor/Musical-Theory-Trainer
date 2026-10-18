@@ -123,4 +123,23 @@
 
 **Próxima semana:** Geração de exercícios de reconhecimento de acordes; Sessões para exercícios de reconhecimento de acordes; Ecrãs para resolução de exercícios de reconhecimento de acordes; Controlo principal da aplicação necessário à resolução de exercícios de acordes; Modelo de ritmos; Reprodução áudio de ritmos.
 
+---
+
+## Sem. 10 · 12 - 18 out
+
+**Feito:** 
+
+- Implementado:
+  - Geração de exercícios de reconhecimento de acordes
+  - Sessões para exercícios de reconhecimento de acordes
+  - Ecrãs para resolução de exercícios de reconhecimento de acordes
+  - Controlo principal da aplicação necessário à resolução de exercícios de acordes
+  - Modelo de ritmos
+  - Geração de ritmos
+  - Reprodução áudio de ritmos. 
+
+**Bloqueou:** Nada
+
+**Próxima semana:** Sessões para exercícios de ritmo; ecrã para resolução de exercícios de ritmo; controlo principal da aplicação necessário à resolução de exercícios de ritmo; processamento de notas introduzidas via dispositivo MIDI; Validação de respostas MIDI para exercícios de intervalos; ecrã da interface para resolução de exercícios de intervalos via dspositivo MIDI.
+
 
