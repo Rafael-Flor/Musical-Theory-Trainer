@@ -65,6 +65,14 @@ class ChordExercise(ChoiceExercise):
                 f"Opções erradas: {self.wrong_options}\n"
                 f"Explicação: {self.explanation}")
 
+class RythmExercise:
+    def __init__(self, title, rythm, attack_times,explanation):
+        self.title=title
+        self.rythm=rythm
+        self.attack_times=attack_times
+        self.explanation=explanation
+
+
 class ExerciseGenerator: #Gerador de exercicios
     scale_difficulty_settings = {"easy": ("Major",), "medium": ("Major", "Minor"), "hard" :("Major", "Minor", "Major Pentatonic", "Minor Pentatonic", "Mixolydian", "Dorian")} #Definições de dificuldade relativas ao tipo de escala
     prog_difficulty_settings = {"easy":("MajorDiatonics","MinorDiatonics"),
@@ -327,6 +335,18 @@ class ExerciseGenerator: #Gerador de exercicios
                      f"{note_names}\n")
         return explanation
 
+    def generate_rythm_exercise(self, difficulty):
+        rythm = self.generate_rythm(difficulty)
+        attack_times=[0]
+        for measure in rythm.measures:
+            for unit in measure:
+                attack_times.append(attack_times[-1]+unit.duration)
+        attack_times.pop()
+
+        explanation = self.generate_rythm_explanation(rythm)
+
+        return RythmExercise("Reconhecimento e execução de ritmos", rythm, attack_times,explanation)
+
     def generate_rythm(self, difficulty): #Gera um ritmo em função do nível de dificuldade
         compass= random.choice(self.rythm_cmp_difficulty_settings[difficulty]) #Escolher uma fórmula de compasso
         measure_num= self.rythm_len_difficulty_settings[difficulty] #Obter o número de compassos do rítmo
@@ -358,6 +378,20 @@ class ExerciseGenerator: #Gerador de exercicios
             if rythm_unit.name in self.rythm_unit_difficulty_settings[difficulty] and rythm_unit.duration <= measure_left:
                 allowed_units.append(rythm_unit)
         return allowed_units
+
+    def generate_rythm_explanation(self, rythm):
+        compass=rythm.compass
+        measure_n=len(rythm.measures)
+        measure_ex = ""
+        for measure in rythm.measures:
+            measure_ex+=f"O {rythm.measures.index(measure)}º compasso é composto pelas seguintes notas:\n"
+            for unit in measure:
+                measure_ex+=f"{unit.name} Note {unit.symbol} "
+            measure_ex+="\n"
+        explanation = (f"A fórmula de compasso do exercício é {compass}\n"
+                       f"O ritmo reproduzido é composto por {measure_n} compassos\n"
+                       f"{measure_ex}\n")
+        return explanation
 
 
 
