@@ -8,15 +8,22 @@ class AudioEngine:
     def __init__(self):
         self.synth = tinysoundfont.Synth()
 
-        app_dir = Path(__file__).resolve().parent
-        soundfont_path = app_dir / "YDP-GrandPiano.sf2"
-        self.soundfont = self.synth.sfload(str(soundfont_path))
-        self.synth.program_select(0, self.soundfont, 0, 0)
+        self.app_dir = Path(__file__).resolve().parent
+
+
         self.play_thread=None
         self.synth.start()
 
 
+    def load_piano(self):
+        soundfont_path = self.app_dir / "YDP-GrandPiano.sf2"
+        soundfont = self.synth.sfload(str(soundfont_path))
+        self.synth.program_select(0, soundfont, 0, 0)
 
+    def load_drums(self):
+        soundfont_path = self.app_dir / "FreePatsGM-Percussion.sf2"
+        soundfont = self.synth.sfload(str(soundfont_path))
+        self.synth.program_select(0, soundfont, 0, 0)
 
     def is_playing(self): #Verifica se existe uma thread de reprodução ativa
         if self.play_thread is not None and self.play_thread.is_alive():
@@ -67,5 +74,4 @@ class AudioEngine:
     def _play_chord_sequence(self, chords, chord_duration, octave_shift=0): #Reproduz uma sequência de acordes
         for chord in chords:
             self._play_chord(chord, chord_duration, octave_shift)
-
 
