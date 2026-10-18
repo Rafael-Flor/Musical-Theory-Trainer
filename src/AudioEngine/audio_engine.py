@@ -75,3 +75,23 @@ class AudioEngine:
         for chord in chords:
             self._play_chord(chord, chord_duration, octave_shift)
 
+    def play_rythm(self, rythm, speed=0.5):
+        if self.is_playing(): return
+        self.play_thread = threading.Thread(target=self._play_rythm, args=(rythm, speed),daemon=True)
+        self.play_thread.start()
+
+    def _play_rythm(self, rythm, speed=0.5):
+        for measure in rythm.measures:
+            for unit in measure:
+                self.synth.noteon(0, 60, 60)
+                time.sleep(unit.duration/speed)
+                self.synth.noteoff(0, 60)
+
+    def play_rythm_tap(self):
+        if self.is_playing(): return
+        self.play_thread = threading.Thread(target=self._play_rythm_tap, daemon=True)
+        self.play_thread.start()
+
+    def _play_rythm_tap(self):
+        self.synth.noteon(0, 60, 60)
+        self.synth.noteoff(0, 60)
