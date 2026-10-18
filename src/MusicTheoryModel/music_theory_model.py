@@ -53,6 +53,19 @@ class ProgDegreeSet: #Conjunto de graus que podem compor uma progressão harmón
         self.chord_degrees=chord_degrees
         self.mode=mode
 
+class RythmUnit: #Unidade rítmica para construir ritmos
+    def __init__(self, name, duration, symbol):
+        self.name=name
+        self.duration=duration
+        self.symbol=symbol
+
+class Rythm:
+    def __init__(self, compass, measures):
+        self.compass=compass
+        self.measures=measures
+
+
+
 class MusicTheoryModel:
     NATURAL_NOTE_NAMES=["C","D","E","F","G","A","B"]
     TONICS = (
@@ -103,6 +116,13 @@ class MusicTheoryModel:
             ProgDegreeSet("MajorSus4", {"Isus4": "Sus4", "iisus4": "Sus4", "IVsus4": "Sus4", "Vsus4": "Sus4"},[1, 2, 4, 5], "Major"),
             ProgDegreeSet("MinorSus2", {"isus2": "Sus2", "iisus2": "Sus2", "ivsus2": "Sus2", "vsus2": "Sus2"}, [1, 2, 4, 5], "Minor"),
             ProgDegreeSet("MinorSus4", {"isus4": "Sus4", "iisus4": "Sus4", "ivsus4": "Sus4", "vsus4": "Sus4"},[1, 2, 4, 5], "Minor")
+        ]
+        self.rythm_units=[      #Definição de unidades ritmicas
+            RythmUnit("Whole", 1, "𝅝"),
+            RythmUnit("Half", 1/2, "𝅗𝅥"),
+            RythmUnit("Quarter", 1/4, "𝅘𝅥"),
+            RythmUnit("Eighth", 1/8,"♪"),
+            RythmUnit("Sixteenth", 1/16, "𝅘𝅥𝅯")
         ]
 
 
