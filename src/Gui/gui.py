@@ -1,8 +1,10 @@
 
-from PySide6 import QtCore, QtWidgets
+from PySide6 import QtCore, QtWidgets, QtGui
 from PySide6.QtWidgets import QHBoxLayout
 
 from src.Events import Event
+
+
 
 class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
     def __init__(self):
@@ -16,6 +18,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.int_scale_exercise_page = IntervalScaleExPage()
         self.prog_exercise_page= ProgExPage()
         self.chord_exercise_page=ChordExPage()
+        self.rythm_exercise_page= RythmExPage()
         self.explanation_page = ExplanationPage()
         self.evaluation_page = EvaluationPage()
 
@@ -25,6 +28,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.pages.addWidget(self.int_scale_exercise_page)
         self.pages.addWidget(self.prog_exercise_page)
         self.pages.addWidget(self.chord_exercise_page)
+        self.pages.addWidget(self.rythm_exercise_page)
         self.pages.addWidget(self.explanation_page)
         self.pages.addWidget(self.evaluation_page)
 
@@ -60,6 +64,9 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.chord_exercise_page.multiple_choice.enable_options()
         self.pages.setCurrentWidget(self.chord_exercise_page)
 
+    def show_rythm_page(self):
+        self.pages.setCurrentWidget(self.rythm_exercise_page)
+
     def show_explanation_page(self, explanation):
         self.explanation_page.set_explanation(explanation)
         self.pages.setCurrentWidget(self.explanation_page)
@@ -91,17 +98,22 @@ class MainMenu(QtWidgets.QWidget): #Página do menu principal
         self.prog_code = "harmonic_prog"
         self.chord_title = "Exercício de reconhecimento de acordes"
         self.chord_code = "chord"
+        self.rythm_title = "Exercício de reconhecimento e execução de ritmos"
+        self.rythm_code = "rythm"
         self.interval_scale_bt=QtWidgets.QPushButton(self.interval_scale_title)
         self.interval_scale_bt.clicked.connect(lambda: self.exercise_selected.emit(self.interval_scale_title,self.interval_scale_code)) #Quando clicar no botão emitir o sinal de seleção de exercício
         self.prog_bt = QtWidgets.QPushButton(self.prog_title)
         self.prog_bt.clicked.connect(lambda: self.exercise_selected.emit(self.prog_title,self.prog_code))
         self.chord_bt = QtWidgets.QPushButton(self.chord_title)
         self.chord_bt.clicked.connect(lambda: self.exercise_selected.emit(self.chord_title, self.chord_code))
+        self.rythm_bt = QtWidgets.QPushButton(self.rythm_title)
+        self.rythm_bt.clicked.connect(lambda: self.exercise_selected.emit(self.rythm_title, self.rythm_code))
 
         #Adicionar elementos ao layout da página
         self.layout.addWidget(self.interval_scale_bt)
         self.layout.addWidget(self.prog_bt)
         self.layout.addWidget(self.chord_bt)
+        self.layout.addWidget(self.rythm_bt)
 
 
 
@@ -160,8 +172,7 @@ class ConfigPage(QtWidgets.QWidget): #Página de configuração de exercícios
         selected_mode = self.set_mode.currentData()
         self.exercise_configured.emit(selected_exercise,selected_difficulty,selected_exercise_num,selected_mode)
 
-
-class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
+class MultipleChExPage(QtWidgets.QWidget): #Página para resolução de exercícios
     #Criar eventos
     explanation_requested = Event() #Pedir explicação do exercício
     def __init__(self):
@@ -226,7 +237,7 @@ class MultipleChoice(QtWidgets.QWidget):
             button.setDisabled(True)
 
 
-class IntervalScaleExPage(ExPage): #Página para resolução de exercícios de reconhecimento de intervalos em escalas
+class IntervalScaleExPage(MultipleChExPage): #Página para resolução de exercícios de reconhecimento de intervalos em escalas
 
     tonic_playback_requested = Event()  # Pedir reprodução da tónica
     interval_note_playback_requested = Event()  # Pedir reprodução da nota do intervalo
@@ -249,7 +260,7 @@ class IntervalScaleExPage(ExPage): #Página para resolução de exercícios de r
     def set_current_exercise(self, scale_info): #Atualiza informação da escala
         self.scale_info.setText(scale_info)
 
-class ProgExPage(ExPage): #Página para resolução de exercícios de reconhecimento de progressões harmónicas
+class ProgExPage(MultipleChExPage): #Página para resolução de exercícios de reconhecimento de progressões harmónicas
 
     prog_playback_requested = Event()
 
@@ -268,7 +279,7 @@ class ProgExPage(ExPage): #Página para resolução de exercícios de reconhecim
     def set_current_exercise(self, scale_info): #Atualiza informação da progressão
         self.prog_info.setText(scale_info)
 
-class ChordExPage(ExPage): #Página para resolução de exercícios de reconhecimento de acordes
+class ChordExPage(MultipleChExPage): #Página para resolução de exercícios de reconhecimento de acordes
 
     chord_playback_requested = Event()
 
@@ -287,6 +298,46 @@ class ChordExPage(ExPage): #Página para resolução de exercícios de reconheci
     def set_current_exercise(self, chord_info): #Atualiza informação do acorde
         self.chord_info.setText(chord_info)
 
+class RythmExPage(QtWidgets.QWidget):
+    # Criar eventos
+    explanation_requested = Event()  # Pedir explicação do exercício
+    rythm_plyback_requested = Event()
+    answer_button_pressed = Event()
+
+    def __init__(self):
+        super().__init__()
+
+        self.layout = QtWidgets.QVBoxLayout(self)
+        self.layout.setAlignment(QtCore.Qt.AlignTop)
+        self.layout.setContentsMargins(0, 50, 0, 0)
+
+        self.title = QtWidgets.QLabel("")
+        self.instructions = QtWidgets.QLabel("")
+
+        self.feedback = QtWidgets.QLabel("")
+
+        self.rythm_bt=QtWidgets.QPushButton("Reproduzir Ritmo")
+        self.rythm_bt.clicked.connect(lambda: self.rythm_plyback_requested.emit())
+
+        self.continue_bt = QtWidgets.QPushButton("Continuar")
+        self.continue_bt.clicked.connect(lambda: self.explanation_requested.emit())
+
+        self.answer_bt=QtWidgets.QPushButton(".")
+        self.answer_bt.clicked.connect(lambda: self.answer_button_pressed.emit())
+
+        self.layout.addWidget(self.title)
+        self.layout.addWidget(self.instructions)
+        self.layout.addWidget(self.rythm_bt)
+        self.layout.addWidget(self.answer_bt)
+        self.layout.addWidget(self.feedback)
+        self.layout.addWidget(self.continue_bt)
+
+    def set_feedback(self, feedback):  # Atualiza o feedback da resposta
+        self.feedback.setText(feedback)
+
+    def show_feedback(self):  # Mostra o feedback da resposta
+        self.feedback.show()
+
 
 class ExplanationPage(QtWidgets.QWidget):
     next_exercise_requested = Event()
@@ -298,6 +349,7 @@ class ExplanationPage(QtWidgets.QWidget):
         self.layout.setContentsMargins(0, 50, 0, 0)
 
         self.explanation=QtWidgets.QLabel("")
+        self.explanation.setFont(QtGui.QFont("Noto Sans Symbols 2", 10))
         self.continue_bt=QtWidgets.QPushButton("Continuar")
         self.continue_bt.clicked.connect(lambda : self.next_exercise_requested.emit())
 
