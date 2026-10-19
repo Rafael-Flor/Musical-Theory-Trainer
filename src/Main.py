@@ -1,3 +1,5 @@
+import time
+
 from PySide6 import QtWidgets
 
 
@@ -22,6 +24,7 @@ class Main:
         self.i_s_screen = self.window.int_scale_exercise_page
         self.p_screen = self.window.prog_exercise_page
         self.c_screen = self.window.chord_exercise_page
+        self.r_screen = self.window.rythm_exercise_page
         self.explain_screen = self.window.explanation_page
         self.eval_screen = self.window.evaluation_page
 
@@ -39,6 +42,10 @@ class Main:
         self.c_screen.chord_playback_requested.subscribe(self.play_c_chord)
         self.c_screen.multiple_choice.answer_submited.subscribe(self.process_c_answer)
         self.c_screen.explanation_requested.subscribe(self.show_explanation)
+        self.r_screen.rythm_plyback_requested.subscribe(self.play_r_rythm)
+        self.r_screen.answer_button_pressed.subscribe(self.process_r_input)
+        self.r_screen.explanation_requested.subscribe(self.show_explanation)
+
 
     def show_menu(self): #Mostra menu de seleção de exercícios
         self.window.show_menu()
@@ -64,6 +71,8 @@ class Main:
                 self.show_p_exercise()
             case "chord":
                 self.show_c_exercise()
+            case "rythm":
+                self.show_r_exercise()
 
     def show_i_s_exercise(self): #Mostra um exercício de reconhecimento de intervalos em escalas na interface
         session = self.exercise_manager.exercise_session
@@ -82,6 +91,11 @@ class Main:
         chord_info = session.current_exercise_chord_info()
         options = session.exercise_answer_options()
         self.window.show_chord_page(chord_info, options)
+
+    def show_r_exercise(self):
+        session = self.exercise_manager.exercise_session
+        print(session.current_exercise().explanation)
+        self.window.show_rythm_page()
 
     def show_explanation(self):
         session = self.exercise_manager.exercise_session
@@ -118,6 +132,16 @@ class Main:
         self.c_screen.set_feedback(feedback)
         self.c_screen.show_feedback()
 
+    def process_r_input(self):
+        current_time=time.perf_counter()
+        session=self.exercise_manager.exercise_session
+        session.play_input_sound()
+        session.validate_input(current_time)
+        if session.exercise_answered:
+            feedback=session.get_last_rating_feedback()
+            self.r_screen.set_feedback(feedback)
+
+
     def play_i_s_tonic(self):
         session = self.exercise_manager.exercise_session
         session.play_exercise_tonic()
@@ -134,10 +158,15 @@ class Main:
         session = self.exercise_manager.exercise_session
         session.play_exercise_chord()
 
+    def play_r_rythm(self):
+        session = self.exercise_manager.exercise_session
+        session.play_exercise_rythm()
+
     def show_eval(self):
         session = self.exercise_manager.exercise_session
         session.set_result_stats()
         self.window.show_evaluation_page(session.correct_count, session.accuracy, session.evaluation)
+
 
 
 
