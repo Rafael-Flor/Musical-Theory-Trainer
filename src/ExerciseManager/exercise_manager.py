@@ -1,4 +1,5 @@
 import random
+import time
 
 from src.AudioEngine.audio_engine import AudioEngine
 from src.Events import Event
@@ -34,6 +35,13 @@ class ExerciseSession: #Sessão para realização de um conjunto de exercícios
     def exercise_explanation(self): #Retorna a explicação do exercício
         return self.current_exercise().explanation
 
+
+
+class MultipleCSession(ExerciseSession):
+
+    def __init__(self,exercises, audio_engine):
+        super().__init__(exercises, audio_engine)
+
     def exercise_answer_options(self): #Retorna as opções de resposta do exercício
         options=self.current_exercise().wrong_options.copy()
         options.append(self.current_exercise().correct_answer)
@@ -60,11 +68,10 @@ class ExerciseSession: #Sessão para realização de um conjunto de exercícios
         elif self.accuracy <= 100:
             self.evaluation="Bom"
 
-
-
-class IntervalScaleSession(ExerciseSession): #Sessão para realização de um conjunto de exercícios
+class IntervalScaleSession(MultipleCSession): #Sessão para realização de um conjunto de exercícios
     def __init__(self,exercises, audio_engine):
         super().__init__(exercises, audio_engine)
+        self.audio_engine.load_piano()
         self.exercise_type = "interval_scale"
 
     def play_exercise_tonic(self): #Reproduzir a tónica do exercício
@@ -86,9 +93,10 @@ class IntervalScaleSession(ExerciseSession): #Sessão para realização de um co
         exercise=self.exercises[self.current_index]
         return f"Escala {exercise.scale.tonic.name} {exercise.scale.scale_type.name}"
 
-class ProgressionSession(ExerciseSession): #Sessão para realização de exercícios de progressões
+class ProgressionSession(MultipleCSession): #Sessão para realização de exercícios de progressões
     def __init__(self,exercises, audio_engine):
         super().__init__(exercises, audio_engine)
+        self.audio_engine.load_piano()
         self.exercise_type="harmonic_prog"
 
     def play_exercise_prog(self): #Reproduz a progressão do exercício
@@ -100,9 +108,10 @@ class ProgressionSession(ExerciseSession): #Sessão para realização de exercí
         prog=exercise.progression
         return f"Tonalidade {prog.scale.tonic.name} {prog.scale.scale_type.name}"
 
-class ChordSession(ExerciseSession): #Sessão para realização de exercícios de acordes
+class ChordSession(MultipleCSession): #Sessão para realização de exercícios de acordes
     def __init__(self,exercises, audio_engine):
         super().__init__(exercises, audio_engine)
+        self.audio_engine.load_piano()
         self.exercise_type="chord"
 
     def play_exercise_chord(self): #Reproduz o acorde do exercício
@@ -114,7 +123,77 @@ class ChordSession(ExerciseSession): #Sessão para realização de exercícios d
         chord=exercise.chord
         return f"Tónica {chord.tonic.name}"
 
+class RythmSession(ExerciseSession): #Sessão para realizar exercícios de ritmo
+    def __init__(self,exercises, audio_engine):
+        super().__init__(exercises, audio_engine)
+        self.audio_engine.load_drums()
+        self.exercise_type="rythm"
+        self.exercise_accuracies=[]
+        self.answer_ratings=[]
+        self.input_count=0
+        self.start_time=0
+        self.rythm_speed=0.5
 
+    def play_exercise_rythm(self): #Reproduz o ritmo do exercício
+        rythm=self.current_exercise().rythm
+        self.audio_engine.play_rythm(rythm, self.rythm_speed)
+
+    def play_input_sound(self):
+        self.audio_engine.play_rythm_tap()
+
+    def validate_input(self, time): #Valida um input de resposta
+        if not self.exercise_answered:
+            if self.input_count==0: #Definir o momento do 1º input de resposta como o inicio do ritmo introduzido
+                self.start_time=time
+                self.input_count+=1
+            else:
+                attack_count = 0
+                for measure in self.current_exercise().rythm.measures:  # Contabilizar o número de ataques no ritmo
+                    for unit in measure:
+                        attack_count += 1
+                target=self.current_exercise().attack_times[self.input_count]/self.rythm_speed+self.start_time #Tempo alvo do próximo ataque do ritmo
+                error=abs(target-time)*100 #Erro em ms do input em relação ao tempo alvo
+                print(error)
+                if error <= 50: #Classificar o input com base no erro
+                    self.exercise_accuracies.append(3)
+                elif error <= 100:
+                    self.exercise_accuracies.append(2)
+                else:
+                    self.exercise_accuracies.append(1)
+                print(self.exercise_accuracies[-1])
+                self.input_count+=1
+                if self.input_count >= attack_count: #Verificar se o ritmo introduzido terminou
+                    self.input_count=0
+                    self.exercise_answered=True
+                    self.set_answer_accuracy()
+
+    def get_last_rating_feedback(self):
+        rating=self.answer_ratings[-1]
+        print(rating)
+        if rating < 1.5:
+            return "Fraco"
+        elif rating < 2.5:
+            return "Suficiente"
+        else:
+            return "Bom"
+
+    def set_answer_accuracy(self): #Adiciona a média do desempenho no exercício à lista de avaliações da sessão
+        self.answer_ratings.append(sum(self.exercise_accuracies)/(len(self.exercise_accuracies)))
+
+    def set_result_stats(self): #Atualiza as estatisticas de desempenho
+        self.accuracy=sum(self.answer_ratings)/len(self.answer_ratings)
+        if self.accuracy < 1.5:
+            self.evaluation = "Fraco"
+        elif self.accuracy < 2.5:
+            self.evaluation = "Suficiente"
+        else:
+            self.evaluation = "Bom"
+
+    def next_exercise(self): #Avana para o próximo exercício da sessão
+        self.current_index+=1
+        self.exercise_answered=False
+        self.exercise_accuracies=[]
+        self.input_count=0
 
 class ExerciseManager: #Gestor de exercícios
 
@@ -143,5 +222,9 @@ class ExerciseManager: #Gestor de exercícios
                 for i in range(selected_exercise_num):
                     exercises.append(generator.generate_chord_exercise(selected_difficulty, generate_options))
                 self.exercise_session = ChordSession(exercises, self.audio_engine)
+            case "rythm":
+                for i in range(selected_exercise_num):
+                    exercises.append(generator.generate_rythm_exercise(selected_difficulty))
+                self.exercise_session = RythmSession(exercises, self.audio_engine)
 
 
