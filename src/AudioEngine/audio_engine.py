@@ -8,15 +8,22 @@ class AudioEngine:
     def __init__(self):
         self.synth = tinysoundfont.Synth()
 
-        app_dir = Path(__file__).resolve().parent
-        soundfont_path = app_dir / "YDP-GrandPiano.sf2"
-        self.soundfont = self.synth.sfload(str(soundfont_path))
-        self.synth.program_select(0, self.soundfont, 0, 0)
+        self.app_dir = Path(__file__).resolve().parent
+
+
         self.play_thread=None
         self.synth.start()
 
 
+    def load_piano(self):
+        soundfont_path = self.app_dir / "YDP-GrandPiano.sf2"
+        soundfont = self.synth.sfload(str(soundfont_path))
+        self.synth.program_select(0, soundfont, 0, 0)
 
+    def load_drums(self):
+        soundfont_path = self.app_dir / "FreePatsGM-Percussion.sf2"
+        soundfont = self.synth.sfload(str(soundfont_path))
+        self.synth.program_select(0, soundfont, 0, 0)
 
     def is_playing(self): #Verifica se existe uma thread de reprodução ativa
         if self.play_thread is not None and self.play_thread.is_alive():
@@ -68,4 +75,23 @@ class AudioEngine:
         for chord in chords:
             self._play_chord(chord, chord_duration, octave_shift)
 
+    def play_rythm(self, rythm, speed=0.5):
+        if self.is_playing(): return
+        self.play_thread = threading.Thread(target=self._play_rythm, args=(rythm, speed),daemon=True)
+        self.play_thread.start()
 
+    def _play_rythm(self, rythm, speed=0.5):
+        for measure in rythm.measures:
+            for unit in measure:
+                self.synth.noteon(0, 60, 60)
+                time.sleep(unit.duration/speed)
+                self.synth.noteoff(0, 60)
+
+    def play_rythm_tap(self):
+        if self.is_playing(): return
+        self.play_thread = threading.Thread(target=self._play_rythm_tap, daemon=True)
+        self.play_thread.start()
+
+    def _play_rythm_tap(self):
+        self.synth.noteon(0, 60, 60)
+        self.synth.noteoff(0, 60)
