@@ -1,16 +1,18 @@
 
-from src.MusicTheoryModel.music_theory_model import Scale, Note, Chord, ChordProg, ChordProgType
+from src.MusicTheoryModel.music_theory_model import Scale, Note, Chord, ChordProg, ChordProgType, Rythm
 
 import random
 
-class Exercise:
+
+
+class ChoiceExercise:
     def __init__(self, title, correct_answer, wrong_answers, explanation):
         self.title = title
         self.wrong_options = wrong_answers
         self.correct_answer = correct_answer
         self.explanation = explanation
 
-class IntervalScaleExercise(Exercise):
+class IntervalScaleExercise(ChoiceExercise):
 
     def __init__(self, scale, interval_note, title, correct_answer, wrong_answers, explanation):
         super().__init__(title, correct_answer, wrong_answers, explanation)
@@ -27,7 +29,7 @@ class IntervalScaleExercise(Exercise):
                 f"Opções erradas: {self.wrong_options}\n"
                 f"Explicação: {self.explanation}")
 
-class ProgressionExercise(Exercise):
+class ProgressionExercise(ChoiceExercise):
     def __init__(self, progression, title, correct_answer, wrong_answers, explanation):
         super().__init__(title, correct_answer, wrong_answers, explanation)
         self.progression=progression
@@ -45,7 +47,7 @@ class ProgressionExercise(Exercise):
                 f"Opções erradas: {self.wrong_options}\n"
                 f"Explicação: {self.explanation}")
 
-class ChordExercise(Exercise):
+class ChordExercise(ChoiceExercise):
     def __init__(self, chord, title, correct_answer, wrong_answers, explanation):
         super().__init__(title, correct_answer, wrong_answers, explanation)
         self.chord=chord
@@ -63,6 +65,14 @@ class ChordExercise(Exercise):
                 f"Opções erradas: {self.wrong_options}\n"
                 f"Explicação: {self.explanation}")
 
+class RythmExercise:
+    def __init__(self, title, rythm, attack_times,explanation):
+        self.title=title
+        self.rythm=rythm
+        self.attack_times=attack_times
+        self.explanation=explanation
+
+
 class ExerciseGenerator: #Gerador de exercicios
     scale_difficulty_settings = {"easy": ("Major",), "medium": ("Major", "Minor"), "hard" :("Major", "Minor", "Major Pentatonic", "Minor Pentatonic", "Mixolydian", "Dorian")} #Definições de dificuldade relativas ao tipo de escala
     prog_difficulty_settings = {"easy":("MajorDiatonics","MinorDiatonics"),
@@ -70,6 +80,10 @@ class ExerciseGenerator: #Gerador de exercicios
                                 "hard":("MajorDiatonics","MinorDiatonics","Major7thDiatonics","Minor7thDiatonics","MajorSus2","MinorSus2","MajorSus4","MinorSus4")}
     prog_len_difficulty_settings = {"easy":(2,),"medium":(2,3,4),"hard": (4,5,6)}
     chord_difficulty_settings ={"easy":("Major","Minor"), "medium":("Major","Minor","Major7","Minor7","7"),"hard":("Major","Minor","Major7","Minor7","7","Diminished","Diminished7","Halfdiminished7","Sus2","Sus4")}
+    rythm_cmp_difficulty_settings={"easy":("4/4",),"medium":("4/4","3/4","2/4"),"hard":("4/4","3/4","2/4","5/4","7/4")}
+    rythm_len_difficulty_settings={"easy":1, "medium":2, "hard":3}
+    rythm_unit_difficulty_settings={"easy":("Half","Quarter"),"medium":("Whole","Half","Quarter","Eight"),"hard":("Whole","Half","Quarter","Eight","Sixteenth")}
+    countdown_unit="Quarter"
 
     def __init__(self, theory_model):
         self.theory_model=theory_model #Modelo de teoria que o gerador utiliza
@@ -321,8 +335,63 @@ class ExerciseGenerator: #Gerador de exercicios
                      f"{note_names}\n")
         return explanation
 
+    def generate_rythm_exercise(self, difficulty):
+        rythm = self.generate_rythm(difficulty)
+        attack_times=[0]
+        for measure in rythm.measures:
+            for unit in measure:
+                attack_times.append(attack_times[-1]+unit.duration)
+        attack_times.pop()
 
+        explanation = self.generate_rythm_explanation(rythm)
 
+        return RythmExercise("Reconhecimento e execução de ritmos", rythm, attack_times,explanation)
+
+    def generate_rythm(self, difficulty): #Gera um ritmo em função do nível de dificuldade
+        compass= random.choice(self.rythm_cmp_difficulty_settings[difficulty]) #Escolher uma fórmula de compasso
+        measure_num= self.rythm_len_difficulty_settings[difficulty] #Obter o número de compassos do rítmo
+        compass_nums=compass.split("/")
+        compass_n=int(compass_nums[0])
+        compass_d=int(compass_nums[1])
+        measure_len=compass_n/compass_d #Calcular duração de cada compasso
+        measures=[]
+        units=[]
+        attack_end=0
+        allowed_units=self.get_rythm_units(difficulty, measure_len-attack_end) #Obter unidades rítmicas compatíveis
+        measure_end=measure_len
+        while len(measures)<measure_num: #Até preencher o número de compassos do rítmo
+            if  not allowed_units: #Caso não seja possível adicionar mais unidades ao compasso , dar o compasso por completo
+                measures.append(list(units))
+                measure_end = measure_len * (len(measures) + 1)
+                units=[]
+            else: #Caso contrário, adicionar uma unidade rítimica ao compasso
+                rythm_unit=random.choice(allowed_units)
+                attack_end+=rythm_unit.duration
+                units.append(rythm_unit)
+            allowed_units = self.get_rythm_units(difficulty, measure_end - attack_end)
+
+        return Rythm(compass,measures)
+
+    def get_rythm_units(self, difficulty, measure_left): #Retorna as unidades rítmicas compativeis com a dificuldade e com a duração restante do compasso
+        allowed_units=[]
+        for rythm_unit in self.theory_model.rythm_units:
+            if rythm_unit.name in self.rythm_unit_difficulty_settings[difficulty] and rythm_unit.duration <= measure_left:
+                allowed_units.append(rythm_unit)
+        return allowed_units
+
+    def generate_rythm_explanation(self, rythm):
+        compass=rythm.compass
+        measure_n=len(rythm.measures)
+        measure_ex = ""
+        for measure in rythm.measures:
+            measure_ex+=f"O {rythm.measures.index(measure)}º compasso é composto pelas seguintes notas:\n"
+            for unit in measure:
+                measure_ex+=f"{unit.name} Note {unit.symbol} "
+            measure_ex+="\n"
+        explanation = (f"A fórmula de compasso do exercício é {compass}\n"
+                       f"O ritmo reproduzido é composto por {measure_n} compassos\n"
+                       f"{measure_ex}\n")
+        return explanation
 
 
 
