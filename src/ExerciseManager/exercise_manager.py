@@ -70,6 +70,36 @@ class MultipleCSession(ExerciseSession): #Sessões para exercícios de escolha m
     def get_result_stats(self):
         return [("Numero de exercícios corretos", self.correct_count),("Precisão", self.accuracy),("Avaliação",self.evaluation)]
 
+class MIDISession(ExerciseSession): #Sessões para exercícios com introdução de respostas via dispositivo MIDI
+    def __init__(self,exercises, audio_engine):
+        super().__init__(exercises, audio_engine)
+        self.mode = "midi"
+        self.pressed_keys = []
+        self.correct_inputs = []
+        self.try_count = 0
+        self.exercise_ratings = []
+        self.last_feedback = ""
+
+    def set_result_rating(self): #Atribui uma nota de 1-3 ao exercício resolvido
+        if self.try_count == 1:
+            self.exercise_ratings.append(3)
+        if self.try_count <=3:
+            self.exercise_ratings.append(2)
+        else:
+            self.exercise_ratings.append(1)
+
+    def set_result_stats(self): #Calcula as estatisticas de desempenho nos exercícios resolvidos
+        self.accuracy=sum(self.exercise_ratings)/len(self.exercise_ratings)
+        if self.accuracy < 1.5:
+            self.evaluation = "Fraco"
+        elif self.accuracy < 2.5:
+            self.evaluation = "Suficiente"
+        else:
+            self.evaluation = "Bom"
+
+    def get_result_stats(self):
+        return [("Precisão", self.accuracy/3),("Avaliação",self.evaluation)]
+
 class IntervalScaleMethods: #Métodos para os exercícios de reconhecimento de intervalos em escalas
 
     def play_exercise_tonic(self): #Reproduzir a tónica do exercício
@@ -96,6 +126,55 @@ class IntervalScaleSession(MultipleCSession, IntervalScaleMethods): #Sessão par
         super().__init__(exercises, audio_engine)
         self.audio_engine.load_piano()
         self.exercise_type = "interval_scale"
+
+class MidiIntervalSclSession(MIDISession, IntervalScaleMethods):
+    def __init__(self,exercises, audio_engine):
+        super().__init__(exercises, audio_engine)
+        self.audio_engine.load_piano()
+        self.exercise_type = "interval_scale"
+
+    def receive_input(self, midi_key): #Recebe o input realizado através do dispositivo MIDI
+        if not self.exercise_answered:
+            self.audio_engine.play_midi_key(midi_key)
+            self.pressed_keys.append(midi_key)
+            self.validate_input()
+
+    def validate_input(self):
+        tonic=self.current_exercise().scale.tonic
+        interval_note=self.current_exercise().interval_note
+        key_count=len(self.pressed_keys)
+        if key_count==1:
+            self.correct_inputs.clear()
+            if self.pressed_keys[0] % 12 == tonic.pitch % 12:
+                self.last_feedback="Tónica correta"
+                self.correct_inputs.append(True)
+            else:
+                self.last_feedback="Tónica incorreta"
+                self.try_count += 1
+                self.correct_inputs.append(False)
+                self.pressed_keys.clear()
+        elif key_count==2:
+            if self.pressed_keys[1] % 12 == interval_note.pitch % 12:
+                self.last_feedback = "Intervalo introduzido corretamente"
+                self.try_count += 1
+                self.set_result_rating()
+                self.correct_inputs.append(True)
+                self.exercise_answered=True
+            else:
+                self.last_feedback="Intervalo incorreto"
+                self.try_count += 1
+                self.pressed_keys.clear()
+                self.correct_inputs.append(False)
+
+    def get_input_feedback(self):
+        return self.correct_inputs
+
+    def next_exercise(self):
+        self.current_index+=1
+        self.exercise_answered=False
+        self.try_count = 0
+        self.correct_inputs.clear()
+        self.pressed_keys.clear()
 
 class ProgressionSession(MultipleCSession): #Sessão para realização de exercícios de progressões
     def __init__(self,exercises, audio_engine):
@@ -233,3 +312,11 @@ class ExerciseManager: #Gestor de exercícios
                     for i in range(selected_exercise_num):
                         exercises.append(generator.generate_rythm_exercise(selected_difficulty))
                     self.exercise_session = RythmSession(exercises, self.audio_engine)
+        elif selected_mode == "midi":
+            generate_options = False
+            match selected_exercise:
+                case "interval_scale":
+                    for i in range( selected_exercise_num):
+                        exercises.append(generator.generate_scale_interval_exercise(selected_difficulty, generate_options))
+                    self.exercise_session = MidiIntervalSclSession(exercises, self.audio_engine)
+
