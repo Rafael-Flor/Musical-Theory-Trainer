@@ -67,6 +67,9 @@ class MultipleCSession(ExerciseSession): #Sessões para exercícios de escolha m
         elif self.accuracy <= 100:
             self.evaluation="Bom"
 
+    def get_result_stats(self):
+        return [("Numero de exercícios corretos", self.correct_count),("Precisão", self.accuracy),("Avaliação",self.evaluation)]
+
 class IntervalScaleMethods: #Métodos para os exercícios de reconhecimento de intervalos em escalas
 
     def play_exercise_tonic(self): #Reproduzir a tónica do exercício
@@ -195,6 +198,9 @@ class RythmSession(ExerciseSession): #Sessão para realizar exercícios de ritmo
         self.exercise_answered=False
         self.exercise_accuracies=[]
         self.input_count=0
+
+    def get_result_stats(self):
+        return [("Precisão", self.accuracy/3),("Avaliação",self.evaluation)]
 
 class ExerciseManager: #Gestor de exercícios
 
