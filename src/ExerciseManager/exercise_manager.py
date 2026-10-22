@@ -35,12 +35,11 @@ class ExerciseSession: #Sessão para realização de um conjunto de exercícios
     def exercise_explanation(self): #Retorna a explicação do exercício
         return self.current_exercise().explanation
 
-
-
-class MultipleCSession(ExerciseSession):
+class MultipleCSession(ExerciseSession): #Sessões para exercícios de escolha múltipla
 
     def __init__(self,exercises, audio_engine):
         super().__init__(exercises, audio_engine)
+        self.mode="gui"
 
     def exercise_answer_options(self): #Retorna as opções de resposta do exercício
         options=self.current_exercise().wrong_options.copy()
@@ -68,11 +67,7 @@ class MultipleCSession(ExerciseSession):
         elif self.accuracy <= 100:
             self.evaluation="Bom"
 
-class IntervalScaleSession(MultipleCSession): #Sessão para realização de um conjunto de exercícios
-    def __init__(self,exercises, audio_engine):
-        super().__init__(exercises, audio_engine)
-        self.audio_engine.load_piano()
-        self.exercise_type = "interval_scale"
+class IntervalScaleMethods: #Métodos para os exercícios de reconhecimento de intervalos em escalas
 
     def play_exercise_tonic(self): #Reproduzir a tónica do exercício
 
@@ -92,6 +87,12 @@ class IntervalScaleSession(MultipleCSession): #Sessão para realização de um c
     def current_exercise_scale_info(self): #Retorna o nome da escala
         exercise=self.exercises[self.current_index]
         return f"Escala {exercise.scale.tonic.name} {exercise.scale.scale_type.name}"
+
+class IntervalScaleSession(MultipleCSession, IntervalScaleMethods): #Sessão para realização de um conjunto de exercícios
+    def __init__(self,exercises, audio_engine):
+        super().__init__(exercises, audio_engine)
+        self.audio_engine.load_piano()
+        self.exercise_type = "interval_scale"
 
 class ProgressionSession(MultipleCSession): #Sessão para realização de exercícios de progressões
     def __init__(self,exercises, audio_engine):
@@ -154,9 +155,9 @@ class RythmSession(ExerciseSession): #Sessão para realizar exercícios de ritmo
                 target=self.current_exercise().attack_times[self.input_count]/self.rythm_speed+self.start_time #Tempo alvo do próximo ataque do ritmo
                 error=abs(target-time)*100 #Erro em ms do input em relação ao tempo alvo
                 print(error)
-                if error <= 50: #Classificar o input com base no erro
+                if error <= 25: #Classificar o input com base no erro
                     self.exercise_accuracies.append(3)
-                elif error <= 100:
+                elif error <= 50:
                     self.exercise_accuracies.append(2)
                 else:
                     self.exercise_accuracies.append(1)
@@ -207,24 +208,22 @@ class ExerciseManager: #Gestor de exercícios
     def create_exercise_session(self, selected_exercise,selected_difficulty, selected_exercise_num, selected_mode):
         generator=self.exercise_generator
         exercises=[]
-        if selected_mode == "gui": generate_options=True
-        else: generate_options=False
-        match selected_exercise:
-            case "interval_scale":
-                for i in range(selected_exercise_num): #Gerar o número de exercícios pretendidos de acordo com as configurações selecionada
-                    exercises.append(generator.generate_scale_interval_exercise(selected_difficulty,generate_options))
-                self.exercise_session=IntervalScaleSession(exercises, self.audio_engine) #Criar sessão com os exercícios gerados
-            case "harmonic_prog":
-                for i in range(selected_exercise_num):
-                    exercises.append(generator.generate_prog_exercise(selected_difficulty, generate_options))
-                self.exercise_session=ProgressionSession(exercises, self.audio_engine)
-            case "chord":
-                for i in range(selected_exercise_num):
-                    exercises.append(generator.generate_chord_exercise(selected_difficulty, generate_options))
-                self.exercise_session = ChordSession(exercises, self.audio_engine)
-            case "rythm":
-                for i in range(selected_exercise_num):
-                    exercises.append(generator.generate_rythm_exercise(selected_difficulty))
-                self.exercise_session = RythmSession(exercises, self.audio_engine)
-
-
+        if selected_mode == "gui":
+            generate_options=True
+            match selected_exercise:
+                case "interval_scale":
+                    for i in range(selected_exercise_num): #Gerar o número de exercícios pretendidos de acordo com as configurações selecionada
+                        exercises.append(generator.generate_scale_interval_exercise(selected_difficulty,generate_options))
+                    self.exercise_session=IntervalScaleSession(exercises, self.audio_engine) #Criar sessão com os exercícios gerados
+                case "harmonic_prog":
+                    for i in range(selected_exercise_num):
+                        exercises.append(generator.generate_prog_exercise(selected_difficulty, generate_options))
+                    self.exercise_session=ProgressionSession(exercises, self.audio_engine)
+                case "chord":
+                    for i in range(selected_exercise_num):
+                        exercises.append(generator.generate_chord_exercise(selected_difficulty, generate_options))
+                    self.exercise_session = ChordSession(exercises, self.audio_engine)
+                case "rythm":
+                    for i in range(selected_exercise_num):
+                        exercises.append(generator.generate_rythm_exercise(selected_difficulty))
+                    self.exercise_session = RythmSession(exercises, self.audio_engine)
