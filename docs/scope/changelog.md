@@ -142,4 +142,23 @@
 
 **Próxima semana:** Sessões para exercícios de ritmo; ecrã para resolução de exercícios de ritmo; controlo principal da aplicação necessário à resolução de exercícios de ritmo; processamento de notas introduzidas via dispositivo MIDI; Validação de respostas MIDI para exercícios de intervalos; ecrã da interface para resolução de exercícios de intervalos via dspositivo MIDI.
 
+---
+
+## Sem. 11 · 19 - 25 out
+
+**Feito:** 
+
+- Implementado:
+  - Sessões para realizar exercícios de ritmo
+  - Ecrãs da interface para exercícios de ritmo
+  - Controlo principal necessário à realização de exercícios de ritmo
+  - Sessões MIDI para exercícios de reconhecimento de intervalos em escalas
+  - Reprodução áudio de teclas MIDI
+
+**Bloqueou:** Nada
+
+**Próxima semana:** Revisão da implementação da aplicação; Polimento da interface.
+
+
+
 
