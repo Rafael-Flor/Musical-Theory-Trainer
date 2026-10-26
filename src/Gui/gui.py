@@ -67,10 +67,19 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.prog_exercise_page.multiple_choice.enable_options()
         self.pages.setCurrentWidget(self.prog_exercise_page)
 
-    def show_chord_page(self, chord_info, options):
+    def show_mc_chord_page(self, chord_info, options):
+        if self.chord_exercise_page.current_mode != "mc":
+            self.chord_exercise_page.enable_multiple_choice()
         self.chord_exercise_page.set_current_exercise(chord_info)
         self.chord_exercise_page.multiple_choice.set_answer_options(options)
         self.chord_exercise_page.multiple_choice.enable_options()
+        self.pages.setCurrentWidget(self.chord_exercise_page)
+
+    def show_midi_chord_page(self, chord_info, input_len):
+        if self.chord_exercise_page.current_mode != "midi":
+            self.chord_exercise_page.enable_midi()
+        self.chord_exercise_page.set_current_exercise(chord_info)
+        self.chord_exercise_page.midi_feedback.set_feedback_widget(input_len)
         self.pages.setCurrentWidget(self.chord_exercise_page)
 
     def show_rythm_page(self):
@@ -358,6 +367,7 @@ class ChordExPage(ExPage): #Página para resolução de exercícios de reconheci
         super().__init__()
         self.title.setText("Exercício de reconhecimento de acordes:")
         self.instructions.setText("Clique no botão abaixo para reproduzir o acorde do exercício:")
+        self.midi_txt.setText("Introduza o acorde reproduzido no dispositivo MIDI:")
         self.multiple_choice_txt.setText("Selecione o tipo de acorde reproduzido:")
         self.chord_info = QtWidgets.QLabel("")
         self.chord_bt = QtWidgets.QPushButton("Reproduzir Acorde")
