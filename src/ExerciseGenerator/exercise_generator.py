@@ -3,16 +3,14 @@ from src.MusicTheoryModel.music_theory_model import Scale, Note, Chord, ChordPro
 
 import random
 
-
-
-class ChoiceExercise:
+class Exercise:
     def __init__(self, title, correct_answer, wrong_answers, explanation):
         self.title = title
         self.wrong_options = wrong_answers
         self.correct_answer = correct_answer
         self.explanation = explanation
 
-class IntervalScaleExercise(ChoiceExercise):
+class IntervalScaleExercise(Exercise):
 
     def __init__(self, scale, interval_note, title, correct_answer, wrong_answers, explanation):
         super().__init__(title, correct_answer, wrong_answers, explanation)
@@ -29,7 +27,7 @@ class IntervalScaleExercise(ChoiceExercise):
                 f"Opções erradas: {self.wrong_options}\n"
                 f"Explicação: {self.explanation}")
 
-class ProgressionExercise(ChoiceExercise):
+class ProgressionExercise(Exercise):
     def __init__(self, progression, title, correct_answer, wrong_answers, explanation):
         super().__init__(title, correct_answer, wrong_answers, explanation)
         self.progression=progression
@@ -47,7 +45,7 @@ class ProgressionExercise(ChoiceExercise):
                 f"Opções erradas: {self.wrong_options}\n"
                 f"Explicação: {self.explanation}")
 
-class ChordExercise(ChoiceExercise):
+class ChordExercise(Exercise):
     def __init__(self, chord, title, correct_answer, wrong_answers, explanation):
         super().__init__(title, correct_answer, wrong_answers, explanation)
         self.chord=chord
@@ -83,7 +81,6 @@ class ExerciseGenerator: #Gerador de exercicios
     rythm_cmp_difficulty_settings={"easy":("4/4",),"medium":("4/4","3/4","2/4"),"hard":("4/4","3/4","2/4","5/4","7/4")}
     rythm_len_difficulty_settings={"easy":1, "medium":2, "hard":3}
     rythm_unit_difficulty_settings={"easy":("Half","Quarter"),"medium":("Whole","Half","Quarter","Eight"),"hard":("Whole","Half","Quarter","Eight","Sixteenth")}
-    countdown_unit="Quarter"
 
     def __init__(self, theory_model):
         self.theory_model=theory_model #Modelo de teoria que o gerador utiliza
