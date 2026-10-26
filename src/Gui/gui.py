@@ -46,10 +46,19 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
     def show_menu(self):
         self.pages.setCurrentWidget(self.main_menu)
 
-    def show_interval_scale_page(self, scale_info, options):
+    def show_mc_interval_scale_page(self, scale_info, options):
         self.int_scale_exercise_page.set_current_exercise(scale_info)
+        if self.int_scale_exercise_page.current_mode != "mc":
+            self.int_scale_exercise_page.enable_multiple_choice()
         self.int_scale_exercise_page.multiple_choice.set_answer_options(options)
         self.int_scale_exercise_page.multiple_choice.enable_options()
+        self.pages.setCurrentWidget(self.int_scale_exercise_page)
+
+    def show_midi_interval_scale_page(self, scale_info, input_len):
+        self.int_scale_exercise_page.set_current_exercise(scale_info)
+        if self.int_scale_exercise_page.current_mode != "midi":
+            self.int_scale_exercise_page.enable_midi()
+        self.int_scale_exercise_page.midi_feedback.set_feedback_widget(input_len)
         self.pages.setCurrentWidget(self.int_scale_exercise_page)
 
     def show_prog_page(self, prog_info, options):
@@ -177,6 +186,7 @@ class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
     explanation_requested = Event() #Pedir explicação do exercício
     def __init__(self):
         super().__init__()
+        self.current_mode=""
 
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.setAlignment(QtCore.Qt.AlignTop)
@@ -184,6 +194,9 @@ class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
 
         self.title=QtWidgets.QLabel("")
         self.instructions=QtWidgets.QLabel("")
+
+        self.midi_txt = QtWidgets.QLabel("")
+        self.midi_feedback=MIDI_feedback()
 
         self.multiple_choice_txt = QtWidgets.QLabel("")
         self.multiple_choice=MultipleChoice()
@@ -197,6 +210,8 @@ class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
         self.layout.addWidget(self.instructions)
         self.layout.addWidget(self.multiple_choice_txt)
         self.layout.addWidget(self.multiple_choice)
+        self.layout.addWidget(self.midi_txt)
+        self.layout.addWidget(self.midi_feedback)
         self.layout.addWidget(self.feedback)
         self.layout.addWidget(self.continue_bt)
 
@@ -204,6 +219,20 @@ class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
         self.feedback.setText(feedback)
     def show_feedback(self): #Mostra o feedback da resposta
         self.feedback.show()
+    def enable_multiple_choice(self):
+        self.multiple_choice_txt.show()
+        self.multiple_choice.show()
+        self.midi_txt.hide()
+        self.midi_feedback.hide()
+        self.current_mode="mc"
+    def enable_midi(self):
+        self.midi_txt.show()
+        self.midi_feedback.show()
+        self.multiple_choice_txt.hide()
+        self.multiple_choice.hide()
+        self.current_mode="midi"
+
+
 
 class MultipleChoice(QtWidgets.QWidget):
     answer_submited = Event() #Resposta foi submetida
@@ -288,6 +317,7 @@ class IntervalScaleExPage(ExPage): #Página para resolução de exercícios de r
         self.title.setText("Exercício de reconhecimento de intervalos em escalas")
         self.instructions.setText("Clique nos botões abaixo para reproduzir as notas do exercício")
         self.multiple_choice_txt.setText("Selecione o grau da nota do intervalo:")
+        self.midi_txt.setText("Introduza o intervalo reproduzido no dispositivo MIDI:")
         self.scale_info = QtWidgets.QLabel("")
         self.tonic_bt = QtWidgets.QPushButton("Reproduzir tónica")
         self.tonic_bt.clicked.connect(lambda: self.tonic_playback_requested.emit())
