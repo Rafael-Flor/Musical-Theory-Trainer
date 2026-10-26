@@ -169,13 +169,14 @@ class ExerciseGenerator: #Gerador de exercicios
         scale_type=scale.scale_type.name
         intervals = "|".join( str(interval) for interval in scale.scale_type.note_steps)
         note_names = "|".join(note.name for note in scale.notes)
-        degree=scale.notes.index(interval_note)+1
+        index=scale.notes.index(interval_note)
+        degree=scale.scale_type.scale_degrees[index]
         explanation=(f"A escala do exercicio é a escala de {tonic} {scale_type}\n"
                      f"Uma escala {scale_type} é sempre obtida aplicando a seguinte série de intervalos a partir da tónica:\n"
                      f"{intervals}\n"
                      f"Para a tónica {tonic} a aplicação dos intervalos resulta na obtenção das notas da escala:\n"
                      f"{note_names}\n"
-                     f"A nota reproduzida foi {interval_note.name} que corresponde ao {degree} grau da escala")
+                     f"A nota reproduzida foi {interval_note.name} que corresponde ao {degree} grau diatónico")
         return explanation
 
     def generate_prog_exercise(self, difficulty, generate_options=True):
