@@ -98,8 +98,14 @@ class Main:
     def show_c_exercise(self):  # Mostra um exercício de reconhecimento de acordes na interface
         session = self.exercise_manager.exercise_session
         chord_info = session.current_exercise_chord_info()
-        options = session.exercise_answer_options()
-        self.window.show_chord_page(chord_info, options)
+        if session.mode == "gui":
+            options = session.exercise_answer_options()
+            self.window.show_mc_chord_page(chord_info, options)
+        elif session.mode == "midi":
+            input_len=session.get_expected_input_len()
+            self.midi_listener.listen_for_key()
+            self.window.show_midi_chord_page(chord_info, input_len)
+            self.midi_listener.midi_key_pressed.subscribe(self.on_c_midi_input)
 
     def show_r_exercise(self):
         session = self.exercise_manager.exercise_session
@@ -191,6 +197,15 @@ class Main:
         self.i_s_screen.midi_feedback.set_feedback(session.get_input_feedback())
         if session.exercise_answered:
             self.midi_listener.midi_key_pressed.unsubscribe(self.on_i_s_midi_input)
+
+    def on_c_midi_input(self, midi_key):
+        session = self.exercise_manager.exercise_session
+        session.receive_input(midi_key)
+        self.c_screen.set_feedback(session.last_feedback)
+        self.c_screen.midi_feedback.set_feedback(session.get_input_feedback())
+        if session.exercise_answered:
+            self.midi_listener.midi_key_pressed.unsubscribe(self.on_c_midi_input)
+
 
 
 
