@@ -234,6 +234,50 @@ class MultipleChoice(QtWidgets.QWidget):
         for button in self.buttons:
             button.setDisabled(True)
 
+class MIDI_feedback(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.layout = QtWidgets.QHBoxLayout(self)
+        self.layout.setSpacing(5)
+        self.layout.setContentsMargins(0,0,0,0)
+        self.layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+
+        self.squares=[]
+
+    def set_feedback_widget(self, input_n):
+        if len(self.squares)  > input_n:
+            while len(self.squares) > input_n:
+                self.layout.removeWidget(self.squares[-1])
+                self.squares[-1].deleteLater()
+                self.squares.pop()
+        elif len(self.squares) < input_n:
+            while len(self.squares) < input_n:
+                square = QFrame()
+                square.setFixedSize(40, 40)
+                square.setStyleSheet(
+                    "QFrame { background-color: rgba(0,0,0,255); border: 1px solid rgba(255,255,255,1); border-radius: 4px }")
+                self.layout.addWidget(square)
+                self.squares.append(square)
+        else:
+            for square in self.squares:
+                square.setStyleSheet("QFrame { background-color: rgba(0,0,0,255); border: 1px solid rgba(255,255,255,1); border-radius: 4px }")
+
+
+    def set_feedback(self, correct_inputs):
+        if not correct_inputs:
+            for square in self.squares:
+                square.setStyleSheet("background-color: black")
+        else:
+            for i in range(len(correct_inputs)):
+                if correct_inputs[i]==True:
+                    self.squares[i].setStyleSheet("background-color: green")
+                else:
+                    self.squares[i].setStyleSheet("background-color: black")
+
+
+
+
 class IntervalScaleExPage(ExPage): #Página para resolução de exercícios de reconhecimento de intervalos em escalas
 
     tonic_playback_requested = Event()  # Pedir reprodução da tónica
