@@ -1,6 +1,6 @@
 
 from PySide6 import QtCore, QtWidgets, QtGui
-from PySide6.QtWidgets import QHBoxLayout
+from PySide6.QtWidgets import QHBoxLayout, QFrame
 
 from src.Events import Event
 
@@ -71,8 +71,8 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.explanation_page.set_explanation(explanation)
         self.pages.setCurrentWidget(self.explanation_page)
 
-    def show_evaluation_page(self, correct_count, accuracy, evaluation):
-        self.evaluation_page.set_stats(correct_count, accuracy, evaluation)
+    def show_evaluation_page(self, results):
+        self.evaluation_page.set_stats(results)
         self.pages.setCurrentWidget(self.evaluation_page)
 
 class MainMenu(QtWidgets.QWidget): #Página do menu principal
@@ -172,7 +172,7 @@ class ConfigPage(QtWidgets.QWidget): #Página de configuração de exercícios
         selected_mode = self.set_mode.currentData()
         self.exercise_configured.emit(selected_exercise,selected_difficulty,selected_exercise_num,selected_mode)
 
-class MultipleChExPage(QtWidgets.QWidget): #Página para resolução de exercícios
+class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
     #Criar eventos
     explanation_requested = Event() #Pedir explicação do exercício
     def __init__(self):
@@ -205,8 +205,6 @@ class MultipleChExPage(QtWidgets.QWidget): #Página para resolução de exercíc
     def show_feedback(self): #Mostra o feedback da resposta
         self.feedback.show()
 
-
-
 class MultipleChoice(QtWidgets.QWidget):
     answer_submited = Event() #Resposta foi submetida
     def __init__(self):
@@ -236,8 +234,7 @@ class MultipleChoice(QtWidgets.QWidget):
         for button in self.buttons:
             button.setDisabled(True)
 
-
-class IntervalScaleExPage(MultipleChExPage): #Página para resolução de exercícios de reconhecimento de intervalos em escalas
+class IntervalScaleExPage(ExPage): #Página para resolução de exercícios de reconhecimento de intervalos em escalas
 
     tonic_playback_requested = Event()  # Pedir reprodução da tónica
     interval_note_playback_requested = Event()  # Pedir reprodução da nota do intervalo
@@ -260,7 +257,7 @@ class IntervalScaleExPage(MultipleChExPage): #Página para resolução de exerc�
     def set_current_exercise(self, scale_info): #Atualiza informação da escala
         self.scale_info.setText(scale_info)
 
-class ProgExPage(MultipleChExPage): #Página para resolução de exercícios de reconhecimento de progressões harmónicas
+class ProgExPage(ExPage): #Página para resolução de exercícios de reconhecimento de progressões harmónicas
 
     prog_playback_requested = Event()
 
@@ -279,7 +276,7 @@ class ProgExPage(MultipleChExPage): #Página para resolução de exercícios de 
     def set_current_exercise(self, scale_info): #Atualiza informação da progressão
         self.prog_info.setText(scale_info)
 
-class ChordExPage(MultipleChExPage): #Página para resolução de exercícios de reconhecimento de acordes
+class ChordExPage(ExPage): #Página para resolução de exercícios de reconhecimento de acordes
 
     chord_playback_requested = Event()
 
@@ -368,22 +365,19 @@ class EvaluationPage(QtWidgets.QWidget): #Página para apresentação da avalia�
         self.layout.setAlignment(QtCore.Qt.AlignTop)
         self.layout.setContentsMargins(0, 50, 0, 0)
 
-        self.correct_stat=QtWidgets.QLabel("")
-        self.precision_stat = QtWidgets.QLabel("")
-        self.eval_stat = QtWidgets.QLabel("")
+        self.stats = QtWidgets.QLabel("")
 
         self.continue_bt = QtWidgets.QPushButton("Continuar")
         self.continue_bt.clicked.connect(lambda: self.eval_continue_pressed.emit())
 
-        self.layout.addWidget(self.correct_stat)
-        self.layout.addWidget(self.precision_stat)
-        self.layout.addWidget(self.eval_stat)
+        self.layout.addWidget(self.stats)
         self.layout.addWidget(self.continue_bt)
 
-    def set_stats(self, correct_count, accuracy, evaluation): #Atualiza as estatiscas de avaliação
-        self.correct_stat.setText("Respostas corretas: "+str(correct_count))
-        self.precision_stat.setText("Precisão: "+str(accuracy))
-        self.eval_stat.setText("Avaliação: " + str(evaluation))
+    def set_stats(self, results): #Atualiza as estatiscas de avaliação
+        stats=""
+        for title, stat in results:
+            stats += f"{title}: {stat}\n"
+        self.stats.setText(stats)
 
 
 
