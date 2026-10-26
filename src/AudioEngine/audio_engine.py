@@ -12,6 +12,7 @@ class AudioEngine:
 
 
         self.play_thread=None
+        self.play_semaphore=threading.BoundedSemaphore(5)
         self.synth.start()
 
 
@@ -95,3 +96,13 @@ class AudioEngine:
     def _play_rythm_tap(self):
         self.synth.noteon(0, 60, 60)
         self.synth.noteoff(0, 60)
+
+    def play_midi_key(self, key):
+        if not self.play_semaphore.acquire(blocking=False): return
+        threading.Thread(target=self._play_midi_key, args=(key,), daemon=True).start()
+
+    def _play_midi_key(self,key):
+        self.synth.noteon(0, key, 60)
+        time.sleep(0.25)
+        self.synth.noteoff(0, key)
+        self.play_semaphore.release()
