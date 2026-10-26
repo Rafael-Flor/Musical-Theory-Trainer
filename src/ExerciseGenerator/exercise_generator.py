@@ -80,7 +80,7 @@ class ExerciseGenerator: #Gerador de exercicios
     chord_difficulty_settings ={"easy":("Major","Minor"), "medium":("Major","Minor","Major7","Minor7","7"),"hard":("Major","Minor","Major7","Minor7","7","Diminished","Diminished7","Halfdiminished7","Sus2","Sus4")}
     rythm_cmp_difficulty_settings={"easy":("4/4",),"medium":("4/4","3/4","2/4"),"hard":("4/4","3/4","2/4","5/4","7/4")}
     rythm_len_difficulty_settings={"easy":1, "medium":2, "hard":3}
-    rythm_unit_difficulty_settings={"easy":("Half","Quarter"),"medium":("Whole","Half","Quarter","Eight"),"hard":("Whole","Half","Quarter","Eight","Sixteenth")}
+    rythm_unit_difficulty_settings={"easy":("Half","Quarter"),"medium":("Whole","Half","Quarter","Eighth"),"hard":("Whole","Half","Quarter","Eighth","Sixteenth")}
 
     def __init__(self, theory_model):
         self.theory_model=theory_model #Modelo de teoria que o gerador utiliza
