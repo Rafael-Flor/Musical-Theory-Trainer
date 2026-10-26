@@ -172,7 +172,7 @@ class ExerciseGenerator: #Gerador de exercicios
         index=scale.notes.index(interval_note)
         degree=scale.scale_type.scale_degrees[index]
         explanation=(f"A escala do exercicio é a escala de {tonic} {scale_type}\n"
-                     f"Uma escala {scale_type} é sempre obtida aplicando a seguinte série de intervalos a partir da tónica:\n"
+                     f"Uma escala {scale_type} é sempre obtida aplicando a seguinte série de intervalos entre notas consecutivas:\n"
                      f"{intervals}\n"
                      f"Para a tónica {tonic} a aplicação dos intervalos resulta na obtenção das notas da escala:\n"
                      f"{note_names}\n"
@@ -327,7 +327,7 @@ class ExerciseGenerator: #Gerador de exercicios
         intervals = "|".join( str(interval) for interval in chord.chord_type.note_steps)
         note_names = "|".join(note.name for note in chord.notes)
         explanation=(f"O acorde do exercício é {tonic} {chord_type}\n"
-                     f"Uma acorde {chord_type} é construido aplicando a seguinte série de intervalos a partir da tónica:\n"
+                     f"Uma acorde {chord_type} é construido aplicando a seguinte série de intervalos entre notas consecutivas:\n"
                      f"{intervals}\n"
                      f"Para a tónica {tonic} a aplicação dos intervalos resulta na obtenção das notas do acorde:\n"
                      f"{note_names}\n")
@@ -381,8 +381,8 @@ class ExerciseGenerator: #Gerador de exercicios
         compass=rythm.compass
         measure_n=len(rythm.measures)
         measure_ex = ""
-        for measure in rythm.measures:
-            measure_ex+=f"O {rythm.measures.index(measure)}º compasso é composto pelas seguintes notas:\n"
+        for i, measure in enumerate(rythm.measures, start=1):
+            measure_ex+=f"O {i}º compasso é composto pelas seguintes notas:\n"
             for unit in measure:
                 measure_ex+=f"{unit.name} Note {unit.symbol} "
             measure_ex+="\n"
