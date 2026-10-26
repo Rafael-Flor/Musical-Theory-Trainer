@@ -7,11 +7,14 @@ from src.ExerciseManager.exercise_manager import ExerciseManager
 from src.Gui.gui import MainWindow
 import sys
 
+from src.MIDIEngine.midi_engine import MidiListener
+
 
 class Main:
     def __init__(self):
 
         self.exercise_manager = ExerciseManager() #Gestor de exercícios
+        self.midi_listener = MidiListener()
 
         #Inicializar interface gráfica
         self.app = QtWidgets.QApplication([])
@@ -47,6 +50,7 @@ class Main:
         self.r_screen.explanation_requested.subscribe(self.show_explanation)
 
 
+
     def show_menu(self): #Mostra menu de seleção de exercícios
         self.window.show_menu()
 
@@ -61,7 +65,7 @@ class Main:
             session.next_exercise()
             self.show_exercise(exercise_type) #Se a sessão não terminou, apresentar o próximo exercício
         else:
-            self.show_eval() #Caso contrário, apresentar avaliação do desempenho
+            self.on_session_end() #Caso contrário, apresentar avaliação do desempenho
 
     def show_exercise(self, selected_exercise): #Mostra o exercício na interface
         match selected_exercise:
@@ -77,8 +81,13 @@ class Main:
     def show_i_s_exercise(self): #Mostra um exercício de reconhecimento de intervalos em escalas na interface
         session = self.exercise_manager.exercise_session
         scale_info = session.current_exercise_scale_info()
-        options = session.exercise_answer_options()
-        self.window.show_interval_scale_page(scale_info, options)
+        if session.mode == "gui":
+            options = session.exercise_answer_options()
+            self.window.show_mc_interval_scale_page(scale_info, options)
+        elif session.mode == "midi":
+            self.midi_listener.listen_for_key()
+            self.window.show_midi_interval_scale_page(scale_info, 2)
+            self.midi_listener.midi_key_pressed.subscribe(self.on_i_s_midi_input)
 
     def show_p_exercise(self): #Mostra um exercício de reconhecimento de progressões harmonicas na interface
         session = self.exercise_manager.exercise_session
@@ -162,10 +171,26 @@ class Main:
         session = self.exercise_manager.exercise_session
         session.play_exercise_rythm()
 
+    def on_session_end(self):
+        session = self.exercise_manager.exercise_session
+        if session.mode == "midi":
+            self.midi_listener.stop_listening()
+        self.show_eval()
+
+
     def show_eval(self):
         session = self.exercise_manager.exercise_session
         session.set_result_stats()
-        self.window.show_evaluation_page(session.correct_count, session.accuracy, session.evaluation)
+        results=session.get_result_stats()
+        self.window.show_evaluation_page(results)
+
+    def on_i_s_midi_input(self, midi_key):
+        session = self.exercise_manager.exercise_session
+        session.receive_input(midi_key)
+        self.i_s_screen.set_feedback(session.last_feedback)
+        self.i_s_screen.midi_feedback.set_feedback(session.get_input_feedback())
+        if session.exercise_answered:
+            self.midi_listener.midi_key_pressed.unsubscribe(self.on_i_s_midi_input)
 
 
 
