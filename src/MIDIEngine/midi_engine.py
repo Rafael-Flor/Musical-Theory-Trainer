@@ -1,3 +1,5 @@
+import time
+
 import mido
 
 from src.Events import Event
@@ -13,7 +15,10 @@ class MidiListener:
     def listen_for_key(self):
         if self.port is not None:
             return
-        self.port=mido.open_input(callback=self._on_message)
+        try:
+            self.port=mido.open_input(callback=self._on_message)
+        except OSError as e:
+            raise  OSError(f"Não foi possível abrir o dispositivo MIDI: {e}") from e
 
     def _on_message(self, message):
         if message.type == "note_on" and message.velocity > 0:
