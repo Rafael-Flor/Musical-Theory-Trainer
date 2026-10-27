@@ -89,7 +89,7 @@ class MIDISession(ExerciseSession): #Sessões para exercícios com introdução 
     def set_result_rating(self): #Atribui uma nota de 1-3 ao exercício resolvido
         if self.try_count == 1:
             self.exercise_ratings.append(3)
-        if self.try_count <=3:
+        elif self.try_count <=3:
             self.exercise_ratings.append(2)
         else:
             self.exercise_ratings.append(1)
@@ -261,6 +261,7 @@ class RythmSession(ExerciseSession): #Sessão para realizar exercícios de ritmo
         super().__init__(exercises, audio_engine)
         self.audio_engine.load_drums()
         self.exercise_type="rythm"
+        self.mode="gui"
         self.exercise_accuracies=[]
         self.answer_ratings=[]
         self.input_count=0
