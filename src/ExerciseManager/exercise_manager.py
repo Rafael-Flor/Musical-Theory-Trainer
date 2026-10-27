@@ -238,6 +238,7 @@ class MidiChordSession(MIDISession, ChordMethods):
 
         if all(self.correct_inputs):
             self.last_feedback="Acorde introduzido corretamente"
+            self.try_count+=1
             self.set_result_rating()
             self.exercise_answered=True
 
@@ -286,7 +287,7 @@ class RythmSession(ExerciseSession): #Sessão para realizar exercícios de ritmo
                     for unit in measure:
                         attack_count += 1
                 target=self.current_exercise().attack_times[self.input_count]/self.rythm_speed+self.start_time #Tempo alvo do próximo ataque do ritmo
-                error=abs(target-time)*100 #Erro em ms do input em relação ao tempo alvo
+                error=abs(target-time)*100 #Erro em s do input em relação ao tempo alvo
                 print(error)
                 if error <= 25: #Classificar o input com base no erro
                     self.exercise_accuracies.append(3)
