@@ -18,11 +18,15 @@ class AudioEngine:
 
     def load_piano(self):
         soundfont_path = self.app_dir / "YDP-GrandPiano.sf2"
+        if not soundfont_path.is_file():
+            raise FileNotFoundError(f"Soundfont não encontrado: '{soundfont_path}'")
         soundfont = self.synth.sfload(str(soundfont_path))
         self.synth.program_select(0, soundfont, 0, 0)
 
     def load_drums(self):
         soundfont_path = self.app_dir / "FreePatsGM-Percussion.sf2"
+        if not soundfont_path.is_file():
+            raise FileNotFoundError(f"Soundfont não encontrado: '{soundfont_path}'")
         soundfont = self.synth.sfload(str(soundfont_path))
         self.synth.program_select(0, soundfont, 0, 0)
 
