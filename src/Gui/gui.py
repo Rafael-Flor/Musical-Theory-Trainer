@@ -39,8 +39,8 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.main_menu.exercise_selected.connect(self.show_config_page)
 
 
-    def show_config_page(self,exercise_title, exercise_code): #Mostra a página de configuração
-        self.config_page.set_exercise(exercise_title, exercise_code) #Atualizar página com informação do exercício
+    def show_config_page(self,exercise_title, exercise_code, modes): #Mostra a página de configuração
+        self.config_page.set_exercise(exercise_title, exercise_code, modes) #Atualizar página com informação do exercício
         self.pages.setCurrentWidget(self.config_page) #Mostrar a página de configuração
 
     def show_menu(self):
@@ -94,7 +94,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.pages.setCurrentWidget(self.evaluation_page)
 
 class MainMenu(QtWidgets.QWidget): #Página do menu principal
-    exercise_selected = QtCore.Signal(str, str) #Sinal a emitir quando um exercício for selecionado
+    exercise_selected = QtCore.Signal(str, str, tuple) #Sinal a emitir quando um exercício for selecionado
     def __init__(self):
         super().__init__()
 
@@ -109,29 +109,13 @@ class MainMenu(QtWidgets.QWidget): #Página do menu principal
         QPushButton { text-align: left; padding: 10px; font-size: 20px }
         """)
 
+    def set_main_menu(self, exercises):
         #Criar elementos da página
-        self.interval_scale_title = "Exercícios de reconhecimento de intervalos em escalas"
-        self.interval_scale_code = "interval_scale"
-        self.prog_title = "Exercícios de reconhecimento de progressões harmónicas"
-        self.prog_code = "harmonic_prog"
-        self.chord_title = "Exercício de reconhecimento de acordes"
-        self.chord_code = "chord"
-        self.rythm_title = "Exercício de reconhecimento e execução de ritmos"
-        self.rythm_code = "rythm"
-        self.interval_scale_bt=QtWidgets.QPushButton(self.interval_scale_title)
-        self.interval_scale_bt.clicked.connect(lambda: self.exercise_selected.emit(self.interval_scale_title,self.interval_scale_code)) #Quando clicar no botão emitir o sinal de seleção de exercício
-        self.prog_bt = QtWidgets.QPushButton(self.prog_title)
-        self.prog_bt.clicked.connect(lambda: self.exercise_selected.emit(self.prog_title,self.prog_code))
-        self.chord_bt = QtWidgets.QPushButton(self.chord_title)
-        self.chord_bt.clicked.connect(lambda: self.exercise_selected.emit(self.chord_title, self.chord_code))
-        self.rythm_bt = QtWidgets.QPushButton(self.rythm_title)
-        self.rythm_bt.clicked.connect(lambda: self.exercise_selected.emit(self.rythm_title, self.rythm_code))
+        for exercise in exercises:
+            button = QtWidgets.QPushButton(exercise["title"])
+            button.clicked.connect(lambda checked=False, ex=exercise: self.exercise_selected.emit(ex["title"], ex["id"], ex["modes"]))
+            self.layout.addWidget(button)
 
-        #Adicionar elementos ao layout da página
-        self.layout.addWidget(self.interval_scale_bt)
-        self.layout.addWidget(self.prog_bt)
-        self.layout.addWidget(self.chord_bt)
-        self.layout.addWidget(self.rythm_bt)
 
 
 
@@ -179,9 +163,17 @@ class ConfigPage(QtWidgets.QWidget): #Página de configuração de exercícios
         self.continuar.clicked.connect(self.confirm_config)
 
 
-    def set_exercise(self, exercise_title, exercise_code): #Atualiza a página com a informação do exercício escolhido
+    def set_exercise(self, exercise_title, exercise_code, modes): #Atualiza a página com a informação do exercício escolhido
         self.selected_exercise = exercise_code
         self.title.setText(exercise_title)
+        self.set_mode.setCurrentIndex(0)
+        model = self.set_mode.model()
+        for i in range(self.set_mode.count()):
+            mode_id=self.set_mode.itemData(i)
+            if mode_id in modes:
+                model.item(i).setEnabled(True)
+            else:
+                model.item(i).setEnabled(False)
 
     def confirm_config(self): #Emite um evento com as configurações selecionadas
         selected_exercise = self.selected_exercise
