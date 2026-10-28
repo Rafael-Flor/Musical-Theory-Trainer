@@ -57,55 +57,27 @@ class Main:
 
     def start_exercises(self, selected_exercise, selected_difficulty, selected_exercise_num, selected_mode):
         self.exercise_manager.create_exercise_session(selected_exercise, selected_difficulty, selected_exercise_num, selected_mode) #Criar sessão com as configurações selecionadas na interface
-        self.show_exercise(selected_exercise) #Exibir exercício na interface
+        self.show_exercise() #Exibir exercício na interface
+
+    def show_exercise(self):
+        session=self.exercise_manager.exercise_session
+        state=session.view_state()
+        self.window.show_exercise(session.exercise_type, session.mode, state)
+        if session.exercise_type == "interval_scale" and session.mode == "midi":
+            self.midi_listener.listen_for_key()
+            self.midi_listener.midi_key_pressed.subscribe(self.on_i_s_midi_input)
+        if session.exercise_type == "chord" and session.mode == "midi":
+            self.midi_listener.listen_for_key()
+            self.midi_listener.midi_key_pressed.subscribe(self.on_c_midi_input)
 
     def next_exercise(self):
         session = self.exercise_manager.exercise_session
         exercise_type=session.exercise_type #Avançar para o próximo exercício
         if not session.is_finished():
             session.next_exercise()
-            self.show_exercise(exercise_type) #Se a sessão não terminou, apresentar o próximo exercício
+            self.show_exercise() #Se a sessão não terminou, apresentar o próximo exercício
         else:
             self.on_session_end() #Caso contrário, apresentar avaliação do desempenho
-
-    def show_exercise(self, selected_exercise): #Mostra o exercício na interface
-        match selected_exercise:
-            case "interval_scale":
-                self.show_i_s_exercise()
-            case "harmonic_prog":
-                self.show_p_exercise()
-            case "chord":
-                self.show_c_exercise()
-            case "rythm":
-                self.show_r_exercise()
-
-    def show_i_s_exercise(self): #Mostra um exercício de reconhecimento de intervalos em escalas na interface
-        session = self.exercise_manager.exercise_session
-        state=session.view_state()
-        if session.mode == "gui":
-            self.window.show_mc_interval_scale_page(state.info, state.options)
-        elif session.mode == "midi":
-            self.midi_listener.listen_for_key()
-            self.window.show_midi_interval_scale_page(state.info, state.expected_input_len)
-            self.midi_listener.midi_key_pressed.subscribe(self.on_i_s_midi_input)
-
-    def show_p_exercise(self): #Mostra um exercício de reconhecimento de progressões harmonicas na interface
-        session = self.exercise_manager.exercise_session
-        state = session.view_state()
-        self.window.show_prog_page(state.info, state.options)
-
-    def show_c_exercise(self):  # Mostra um exercício de reconhecimento de acordes na interface
-        session = self.exercise_manager.exercise_session
-        state = session.view_state()
-        if session.mode == "gui":
-            self.window.show_mc_chord_page(state.info, state.options)
-        elif session.mode == "midi":
-            self.midi_listener.listen_for_key()
-            self.window.show_midi_chord_page(state.info, state.expected_input_len)
-            self.midi_listener.midi_key_pressed.subscribe(self.on_c_midi_input)
-
-    def show_r_exercise(self):
-        self.window.show_rythm_page()
 
     def show_explanation(self):
         session = self.exercise_manager.exercise_session
