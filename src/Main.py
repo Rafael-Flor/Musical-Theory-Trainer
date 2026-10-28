@@ -58,14 +58,14 @@ class Main:
     def start_exercises(self, selected_exercise, selected_difficulty, selected_exercise_num, selected_mode):
         self.exercise_manager.create_exercise_session(selected_exercise, selected_difficulty, selected_exercise_num, selected_mode) #Criar sessão com as configurações selecionadas na interface
         self.show_exercise() #Exibir exercício na interface
+        if selected_mode == "midi":
+            self.midi_listener.listen_for_key()
+            self.midi_listener.midi_key_pressed.subscribe(self.on_midi_input)
 
     def show_exercise(self):
         session=self.exercise_manager.exercise_session
         state=session.view_state()
         self.window.show_exercise(session.exercise_type, session.mode, state)
-        if session.mode == "midi":
-            self.midi_listener.listen_for_key()
-            self.midi_listener.midi_key_pressed.subscribe(self.on_midi_input)
 
     def next_exercise(self):
         session = self.exercise_manager.exercise_session
@@ -104,8 +104,7 @@ class Main:
         session.receive_input(midi_key)
         self.window.set_feedback(session.last_feedback)
         self.window.set_midi_feedback(session.get_input_feedback())
-        if session.exercise_answered:
-            self.midi_listener.midi_key_pressed.unsubscribe(self.on_midi_input)
+
 
     def play_i_s_tonic(self):
         session = self.exercise_manager.exercise_session
@@ -130,6 +129,7 @@ class Main:
     def on_session_end(self):
         session = self.exercise_manager.exercise_session
         if session.mode == "midi":
+            self.midi_listener.midi_key_pressed.unsubscribe(self.on_midi_input)
             self.midi_listener.stop_listening()
         self.show_eval()
 
