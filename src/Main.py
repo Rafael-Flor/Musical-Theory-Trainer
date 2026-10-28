@@ -63,12 +63,9 @@ class Main:
         session=self.exercise_manager.exercise_session
         state=session.view_state()
         self.window.show_exercise(session.exercise_type, session.mode, state)
-        if session.exercise_type == "interval_scale" and session.mode == "midi":
+        if session.mode == "midi":
             self.midi_listener.listen_for_key()
-            self.midi_listener.midi_key_pressed.subscribe(self.on_i_s_midi_input)
-        if session.exercise_type == "chord" and session.mode == "midi":
-            self.midi_listener.listen_for_key()
-            self.midi_listener.midi_key_pressed.subscribe(self.on_c_midi_input)
+            self.midi_listener.midi_key_pressed.subscribe(self.on_midi_input)
 
     def next_exercise(self):
         session = self.exercise_manager.exercise_session
@@ -102,6 +99,14 @@ class Main:
             feedback=session.get_last_rating_feedback()
             self.window.set_feedback(feedback)
 
+    def on_midi_input(self, midi_key):
+        session = self.exercise_manager.exercise_session
+        session.receive_input(midi_key)
+        self.window.set_feedback(session.last_feedback)
+        self.window.set_midi_feedback(session.get_input_feedback())
+        if session.exercise_answered:
+            self.midi_listener.midi_key_pressed.unsubscribe(self.on_midi_input)
+
     def play_i_s_tonic(self):
         session = self.exercise_manager.exercise_session
         session.play_exercise_tonic()
@@ -133,23 +138,6 @@ class Main:
         session.set_result_stats()
         results=session.get_result_stats()
         self.window.show_evaluation_page(results)
-
-    def on_i_s_midi_input(self, midi_key):
-        session = self.exercise_manager.exercise_session
-        session.receive_input(midi_key)
-        self.window.set_feedback(session.last_feedback)
-        self.window.set_midi_feedback(session.get_input_feedback())
-        if session.exercise_answered:
-            self.midi_listener.midi_key_pressed.unsubscribe(self.on_i_s_midi_input)
-
-    def on_c_midi_input(self, midi_key):
-        session = self.exercise_manager.exercise_session
-        session.receive_input(midi_key)
-        self.window.set_feedback(session.last_feedback)
-        self.window.set_midi_feedback(session.get_input_feedback())
-        if session.exercise_answered:
-            self.midi_listener.midi_key_pressed.unsubscribe(self.on_c_midi_input)
-
 
 main=Main()
 sys.exit(main.app.exec())
