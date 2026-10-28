@@ -81,36 +81,30 @@ class Main:
 
     def show_i_s_exercise(self): #Mostra um exercício de reconhecimento de intervalos em escalas na interface
         session = self.exercise_manager.exercise_session
-        scale_info = session.current_exercise_scale_info()
+        state=session.view_state()
         if session.mode == "gui":
-            options = session.exercise_answer_options()
-            self.window.show_mc_interval_scale_page(scale_info, options)
+            self.window.show_mc_interval_scale_page(state.info, state.options)
         elif session.mode == "midi":
             self.midi_listener.listen_for_key()
-            self.window.show_midi_interval_scale_page(scale_info, 2)
+            self.window.show_midi_interval_scale_page(state.info, state.expected_input_len)
             self.midi_listener.midi_key_pressed.subscribe(self.on_i_s_midi_input)
 
     def show_p_exercise(self): #Mostra um exercício de reconhecimento de progressões harmonicas na interface
         session = self.exercise_manager.exercise_session
-        prog_info = session.current_exercise_prog_info()
-        options = session.exercise_answer_options()
-        self.window.show_prog_page(prog_info, options)
+        state = session.view_state()
+        self.window.show_prog_page(state.info, state.options)
 
     def show_c_exercise(self):  # Mostra um exercício de reconhecimento de acordes na interface
         session = self.exercise_manager.exercise_session
-        chord_info = session.current_exercise_chord_info()
+        state = session.view_state()
         if session.mode == "gui":
-            options = session.exercise_answer_options()
-            self.window.show_mc_chord_page(chord_info, options)
+            self.window.show_mc_chord_page(state.info, state.options)
         elif session.mode == "midi":
-            input_len=session.get_expected_input_len()
             self.midi_listener.listen_for_key()
-            self.window.show_midi_chord_page(chord_info, input_len)
+            self.window.show_midi_chord_page(state.info, state.expected_input_len)
             self.midi_listener.midi_key_pressed.subscribe(self.on_c_midi_input)
 
     def show_r_exercise(self):
-        session = self.exercise_manager.exercise_session
-        print(session.current_exercise().explanation)
         self.window.show_rythm_page()
 
     def show_explanation(self):
