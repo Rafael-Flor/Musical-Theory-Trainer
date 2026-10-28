@@ -88,31 +88,28 @@ class Main:
         session = self.exercise_manager.exercise_session
         session.validate_answer(answer)
         if session.answer_is_correct(answer):
-            feedback="Certo!"
+            self.window.set_feedback("Certo!")
         else:
-            feedback="Errado!"
-        self.i_s_screen.set_feedback(feedback)
+            self.window.set_feedback("Errado!")
         self.i_s_screen.show_feedback()
 
     def process_p_answer(self, answer): #valida resposta e mostra feedback
         session = self.exercise_manager.exercise_session
         session.validate_answer(answer)
         if session.answer_is_correct(answer):
-            feedback="Certo!"
+            self.window.set_feedback("Certo!")
         else:
-            feedback="Errado!"
-        self.p_screen.set_feedback(feedback)
-        self.p_screen.show_feedback()
+            self.window.set_feedback("Errado!")
+        self.window.show_feedback()
 
     def process_c_answer(self, answer): #valida resposta e mostra feedback
         session = self.exercise_manager.exercise_session
         session.validate_answer(answer)
         if session.answer_is_correct(answer):
-            feedback="Certo!"
+            self.window.set_feedback("Certo!")
         else:
-            feedback="Errado!"
-        self.c_screen.set_feedback(feedback)
-        self.c_screen.show_feedback()
+            self.window.set_feedback("Errado!")
+        self.window.show_feedback()
 
     def process_r_input(self):
         current_time=time.perf_counter()
@@ -121,8 +118,7 @@ class Main:
         session.validate_input(current_time)
         if session.exercise_answered:
             feedback=session.get_last_rating_feedback()
-            self.r_screen.set_feedback(feedback)
-
+            self.window.set_feedback(feedback)
 
     def play_i_s_tonic(self):
         session = self.exercise_manager.exercise_session
@@ -150,7 +146,6 @@ class Main:
             self.midi_listener.stop_listening()
         self.show_eval()
 
-
     def show_eval(self):
         session = self.exercise_manager.exercise_session
         session.set_result_stats()
@@ -160,21 +155,18 @@ class Main:
     def on_i_s_midi_input(self, midi_key):
         session = self.exercise_manager.exercise_session
         session.receive_input(midi_key)
-        self.i_s_screen.set_feedback(session.last_feedback)
-        self.i_s_screen.midi_feedback.set_feedback(session.get_input_feedback())
+        self.window.set_feedback(session.last_feedback)
+        self.window.set_midi_feedback(session.get_input_feedback())
         if session.exercise_answered:
             self.midi_listener.midi_key_pressed.unsubscribe(self.on_i_s_midi_input)
 
     def on_c_midi_input(self, midi_key):
         session = self.exercise_manager.exercise_session
         session.receive_input(midi_key)
-        self.c_screen.set_feedback(session.last_feedback)
-        self.c_screen.midi_feedback.set_feedback(session.get_input_feedback())
+        self.window.set_feedback(session.last_feedback)
+        self.window.set_midi_feedback(session.get_input_feedback())
         if session.exercise_answered:
             self.midi_listener.midi_key_pressed.unsubscribe(self.on_c_midi_input)
-
-
-
 
 
 main=Main()
