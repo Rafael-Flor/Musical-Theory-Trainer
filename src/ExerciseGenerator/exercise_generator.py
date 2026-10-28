@@ -353,22 +353,28 @@ class ExerciseGenerator: #Gerador de exercicios
         compass_d=int(compass_nums[1])
         measure_len=compass_n/compass_d #Calcular duração de cada compasso
         measures=[]
-        units=[]
-        attack_end=0
-        allowed_units=self.get_rythm_units(difficulty, measure_len-attack_end) #Obter unidades rítmicas compatíveis
-        measure_end=measure_len
+        duration_tolerance=1e-9 #margem de erro para as operações realizadas
         while len(measures)<measure_num: #Até preencher o número de compassos do rítmo
-            if  not allowed_units: #Caso não seja possível adicionar mais unidades ao compasso , dar o compasso por completo
-                measures.append(list(units))
-                measure_end = measure_len * (len(measures) + 1)
-                units=[]
-            else: #Caso contrário, adicionar uma unidade rítimica ao compasso
-                rythm_unit=random.choice(allowed_units)
-                attack_end+=rythm_unit.duration
-                units.append(rythm_unit)
-            allowed_units = self.get_rythm_units(difficulty, measure_end - attack_end)
-
+            measure = self.generate_measure(difficulty, measure_len, duration_tolerance) #gerar um compasso completo
+            measures.append(measure)
         return Rythm(compass,measures)
+
+    def generate_measure(self, difficulty, measure_len, duration_tolerance): #gera um compasso completo
+        max_tries = 40 #segurança para evitar que a aplicação deixe de responder, caso ocorra uma situação inesperada emite um erro
+        for i in range(max_tries):
+            units=[]
+            remaining=measure_len
+            allowed=self.get_rythm_units(difficulty, remaining) #obter unidades ritmicas compativeis com a dificuldade e duração de compasso restante
+            while remaining > duration_tolerance and allowed: #adicionar unidades até o compasso preencher ou até que não existam unidades compatíveis
+                unit = random.choice(allowed)
+                units.append(unit)
+                remaining -= unit.duration
+                allowed=self.get_rythm_units(difficulty, remaining)
+            if remaining <= duration_tolerance: #retornar unidades caso o compasso esteja preenchido
+                return units
+        raise RuntimeError("Não foi possível preencher um compasso completo")
+
+
 
     def get_rythm_units(self, difficulty, measure_left): #Retorna as unidades rítmicas compativeis com a dificuldade e com a duração restante do compasso
         allowed_units=[]
