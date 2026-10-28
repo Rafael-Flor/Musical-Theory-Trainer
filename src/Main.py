@@ -2,7 +2,7 @@ import time
 
 from PySide6 import QtWidgets
 
-
+from src.ExerciseManager.catalog import EXERCISES
 from src.ExerciseManager.exercise_manager import ExerciseManager
 from src.Gui.gui import MainWindow
 import sys
@@ -20,6 +20,7 @@ class Main:
         self.app = QtWidgets.QApplication([])
         self.window = MainWindow()
         self.window.resize(800, 600)
+        self.window.main_menu.set_main_menu(EXERCISES)
         self.window.show()
 
         #Ecrãs da interface
