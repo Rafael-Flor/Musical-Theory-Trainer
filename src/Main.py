@@ -36,15 +36,15 @@ class Main:
         self.config_screen.exercise_configured.subscribe(self.start_exercises)
         self.i_s_screen.tonic_playback_requested.subscribe(self.play_i_s_tonic)
         self.i_s_screen.interval_note_playback_requested.subscribe(self.play_i_s_interval_note)
-        self.i_s_screen.multiple_choice.answer_submited.subscribe(self.process_i_s_answer)
+        self.i_s_screen.multiple_choice.answer_submited.subscribe(self.process_mc_answer)
         self.i_s_screen.explanation_requested.subscribe(self.show_explanation)
         self.explain_screen.next_exercise_requested.subscribe(self.next_exercise)
         self.eval_screen.eval_continue_pressed.subscribe(self.show_menu)
         self.p_screen.prog_playback_requested.subscribe(self.play_p_rogression)
-        self.p_screen.multiple_choice.answer_submited.subscribe(self.process_p_answer)
+        self.p_screen.multiple_choice.answer_submited.subscribe(self.process_mc_answer)
         self.p_screen.explanation_requested.subscribe(self.show_explanation)
         self.c_screen.chord_playback_requested.subscribe(self.play_c_chord)
-        self.c_screen.multiple_choice.answer_submited.subscribe(self.process_c_answer)
+        self.c_screen.multiple_choice.answer_submited.subscribe(self.process_mc_answer)
         self.c_screen.explanation_requested.subscribe(self.show_explanation)
         self.r_screen.rythm_plyback_requested.subscribe(self.play_r_rythm)
         self.r_screen.answer_button_pressed.subscribe(self.process_r_input)
@@ -63,12 +63,9 @@ class Main:
         session=self.exercise_manager.exercise_session
         state=session.view_state()
         self.window.show_exercise(session.exercise_type, session.mode, state)
-        if session.exercise_type == "interval_scale" and session.mode == "midi":
+        if session.mode == "midi":
             self.midi_listener.listen_for_key()
-            self.midi_listener.midi_key_pressed.subscribe(self.on_i_s_midi_input)
-        if session.exercise_type == "chord" and session.mode == "midi":
-            self.midi_listener.listen_for_key()
-            self.midi_listener.midi_key_pressed.subscribe(self.on_c_midi_input)
+            self.midi_listener.midi_key_pressed.subscribe(self.on_midi_input)
 
     def next_exercise(self):
         session = self.exercise_manager.exercise_session
@@ -84,25 +81,7 @@ class Main:
         explanation=session.exercise_explanation()
         self.window.show_explanation_page(explanation)
 
-    def process_i_s_answer(self, answer): #valida resposta e mostra feedback
-        session = self.exercise_manager.exercise_session
-        session.validate_answer(answer)
-        if session.answer_is_correct(answer):
-            self.window.set_feedback("Certo!")
-        else:
-            self.window.set_feedback("Errado!")
-        self.i_s_screen.show_feedback()
-
-    def process_p_answer(self, answer): #valida resposta e mostra feedback
-        session = self.exercise_manager.exercise_session
-        session.validate_answer(answer)
-        if session.answer_is_correct(answer):
-            self.window.set_feedback("Certo!")
-        else:
-            self.window.set_feedback("Errado!")
-        self.window.show_feedback()
-
-    def process_c_answer(self, answer): #valida resposta e mostra feedback
+    def process_mc_answer(self, answer): #valida resposta de escolha multipla e mostra feedback
         session = self.exercise_manager.exercise_session
         session.validate_answer(answer)
         if session.answer_is_correct(answer):
@@ -119,6 +98,14 @@ class Main:
         if session.exercise_answered:
             feedback=session.get_last_rating_feedback()
             self.window.set_feedback(feedback)
+
+    def on_midi_input(self, midi_key):
+        session = self.exercise_manager.exercise_session
+        session.receive_input(midi_key)
+        self.window.set_feedback(session.last_feedback)
+        self.window.set_midi_feedback(session.get_input_feedback())
+        if session.exercise_answered:
+            self.midi_listener.midi_key_pressed.unsubscribe(self.on_midi_input)
 
     def play_i_s_tonic(self):
         session = self.exercise_manager.exercise_session
@@ -151,23 +138,6 @@ class Main:
         session.set_result_stats()
         results=session.get_result_stats()
         self.window.show_evaluation_page(results)
-
-    def on_i_s_midi_input(self, midi_key):
-        session = self.exercise_manager.exercise_session
-        session.receive_input(midi_key)
-        self.window.set_feedback(session.last_feedback)
-        self.window.set_midi_feedback(session.get_input_feedback())
-        if session.exercise_answered:
-            self.midi_listener.midi_key_pressed.unsubscribe(self.on_i_s_midi_input)
-
-    def on_c_midi_input(self, midi_key):
-        session = self.exercise_manager.exercise_session
-        session.receive_input(midi_key)
-        self.window.set_feedback(session.last_feedback)
-        self.window.set_midi_feedback(session.get_input_feedback())
-        if session.exercise_answered:
-            self.midi_listener.midi_key_pressed.unsubscribe(self.on_c_midi_input)
-
 
 main=Main()
 sys.exit(main.app.exec())

@@ -94,7 +94,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
                 self.show_mc_chord_page(state.info, state.options)
             case "chord", "midi":
                 self.show_midi_chord_page(state.info, state.expected_input_len)
-            case "rythm":
+            case "rythm", _:
                 self.show_rythm_page()
 
     def show_rythm_page(self):
@@ -112,7 +112,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
 
     def set_midi_feedback(self,flags):
         current_page = self.pages.currentWidget()
-        if isinstance(current_page, ExPage) or isinstance(current_page, RythmExPage):
+        if isinstance(current_page, ExPage):
             current_page.midi_feedback.set_feedback(flags)
 
     def show_explanation_page(self, explanation):
