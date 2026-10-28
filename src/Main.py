@@ -36,15 +36,15 @@ class Main:
         self.config_screen.exercise_configured.subscribe(self.start_exercises)
         self.i_s_screen.tonic_playback_requested.subscribe(self.play_i_s_tonic)
         self.i_s_screen.interval_note_playback_requested.subscribe(self.play_i_s_interval_note)
-        self.i_s_screen.multiple_choice.answer_submited.subscribe(self.process_i_s_answer)
+        self.i_s_screen.multiple_choice.answer_submited.subscribe(self.process_mc_answer)
         self.i_s_screen.explanation_requested.subscribe(self.show_explanation)
         self.explain_screen.next_exercise_requested.subscribe(self.next_exercise)
         self.eval_screen.eval_continue_pressed.subscribe(self.show_menu)
         self.p_screen.prog_playback_requested.subscribe(self.play_p_rogression)
-        self.p_screen.multiple_choice.answer_submited.subscribe(self.process_p_answer)
+        self.p_screen.multiple_choice.answer_submited.subscribe(self.process_mc_answer)
         self.p_screen.explanation_requested.subscribe(self.show_explanation)
         self.c_screen.chord_playback_requested.subscribe(self.play_c_chord)
-        self.c_screen.multiple_choice.answer_submited.subscribe(self.process_c_answer)
+        self.c_screen.multiple_choice.answer_submited.subscribe(self.process_mc_answer)
         self.c_screen.explanation_requested.subscribe(self.show_explanation)
         self.r_screen.rythm_plyback_requested.subscribe(self.play_r_rythm)
         self.r_screen.answer_button_pressed.subscribe(self.process_r_input)
@@ -84,25 +84,7 @@ class Main:
         explanation=session.exercise_explanation()
         self.window.show_explanation_page(explanation)
 
-    def process_i_s_answer(self, answer): #valida resposta e mostra feedback
-        session = self.exercise_manager.exercise_session
-        session.validate_answer(answer)
-        if session.answer_is_correct(answer):
-            self.window.set_feedback("Certo!")
-        else:
-            self.window.set_feedback("Errado!")
-        self.i_s_screen.show_feedback()
-
-    def process_p_answer(self, answer): #valida resposta e mostra feedback
-        session = self.exercise_manager.exercise_session
-        session.validate_answer(answer)
-        if session.answer_is_correct(answer):
-            self.window.set_feedback("Certo!")
-        else:
-            self.window.set_feedback("Errado!")
-        self.window.show_feedback()
-
-    def process_c_answer(self, answer): #valida resposta e mostra feedback
+    def process_mc_answer(self, answer): #valida resposta de escolha multipla e mostra feedback
         session = self.exercise_manager.exercise_session
         session.validate_answer(answer)
         if session.answer_is_correct(answer):
