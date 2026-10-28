@@ -113,7 +113,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
     def set_midi_feedback(self,flags):
         current_page = self.pages.currentWidget()
         if isinstance(current_page, ExPage) or isinstance(current_page, RythmExPage):
-            current_page.MIDI_feedback.set_feedback(flags)
+            current_page.midi_feedback.set_feedback(flags)
 
     def show_explanation_page(self, explanation):
         self.explanation_page.set_explanation(explanation)
