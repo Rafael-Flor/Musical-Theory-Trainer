@@ -4,6 +4,7 @@ import time
 from src.AudioEngine.audio_engine import AudioEngine
 from src.Events import Event
 from src.ExerciseGenerator.exercise_generator import ExerciseGenerator
+from src.ExerciseManager.catalog import get_exercise
 from src.MusicTheoryModel.music_theory_model import MusicTheoryModel
 
 class ExerciseSession: #Sessão para realização de um conjunto de exercícios
@@ -287,15 +288,13 @@ class RythmSession(ExerciseSession): #Sessão para realizar exercícios de ritmo
                     for unit in measure:
                         attack_count += 1
                 target=self.current_exercise().attack_times[self.input_count]/self.rythm_speed+self.start_time #Tempo alvo do próximo ataque do ritmo
-                error=abs(target-time)*100 #Erro em s do input em relação ao tempo alvo
-                print(error)
+                error=abs(target-time)*100 #Erro do input em relação ao tempo alvo
                 if error <= 25: #Classificar o input com base no erro
                     self.exercise_accuracies.append(3)
                 elif error <= 50:
                     self.exercise_accuracies.append(2)
                 else:
                     self.exercise_accuracies.append(1)
-                print(self.exercise_accuracies[-1])
                 self.input_count+=1
                 if self.input_count >= attack_count: #Verificar se o ritmo introduzido terminou
                     self.input_count=0
@@ -334,6 +333,22 @@ class RythmSession(ExerciseSession): #Sessão para realizar exercícios de ritmo
         return [("Precisão", self.accuracy/3),("Avaliação",self.evaluation)]
 
 class ExerciseManager: #Gestor de exercícios
+
+    GENERATORS= { #Chamadas a utilizar para gerar cada tipo de exercício
+        "interval_scale": lambda generator, difficulty, generate_options: generator.generate_scale_interval_exercise(difficulty, generate_options),
+        "harmonic_prog": lambda generator, difficulty, generate_options: generator.generate_prog_exercise(difficulty, generate_options),
+        "chord": lambda generator, difficulty, generate_options: generator.generate_chord_exercise(difficulty,generate_options),
+        "rythm": lambda generator, difficulty, generate_options: generator.generate_rythm_exercise(difficulty),
+    }
+
+    SESSIONS = { #Sessões a utilizar para realizar um exercício num determinado modo
+        ("interval_scale","gui"): IntervalScaleSession,
+        ("interval_scale", "midi"): MidiIntervalSclSession,
+        ("harmonic_prog", "gui"): ProgressionSession,
+        ("chord", "gui"): ChordSession,
+        ("chord", "midi"): MidiChordSession,
+        ("rythm", "gui"): RythmSession,
+    }
 
     def __init__(self):
         self.theory_model=MusicTheoryModel()
