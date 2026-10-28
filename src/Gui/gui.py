@@ -82,6 +82,21 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.chord_exercise_page.midi_feedback.set_feedback_widget(input_len)
         self.pages.setCurrentWidget(self.chord_exercise_page)
 
+    def show_exercise(self, exercise_id, mode, state): #Mostra o exercício na interface
+        match exercise_id, mode:
+            case "interval_scale", "gui":
+                self.show_mc_interval_scale_page(state.info, state.options)
+            case "interval_scale", "midi":
+                self.show_midi_interval_scale_page(state.info, state.expected_input_len)
+            case "harmonic_prog", "gui":
+                self.show_prog_page(state.info, state.options)
+            case "chord", "gui":
+                self.show_mc_chord_page(state.info, state.options)
+            case "chord", "midi":
+                self.show_midi_chord_page(state.info, state.expected_input_len)
+            case "rythm":
+                self.show_rythm_page()
+
     def show_rythm_page(self):
         self.pages.setCurrentWidget(self.rythm_exercise_page)
 
