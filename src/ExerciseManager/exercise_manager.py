@@ -1,11 +1,15 @@
 import random
-import time
 
 from src.AudioEngine.audio_engine import AudioEngine
-from src.Events import Event
 from src.ExerciseGenerator.exercise_generator import ExerciseGenerator
 from src.ExerciseManager.catalog import get_exercise
 from src.MusicTheoryModel.music_theory_model import MusicTheoryModel
+
+class ViewState:
+    def __init__(self, info, options, expected_input_len):
+        self.info = info
+        self.options = options
+        self.expected_input_len = expected_input_len
 
 class ExerciseSession: #Sessão para realização de um conjunto de exercícios
     def __init__(self, exercises, audio_engine):
@@ -16,6 +20,9 @@ class ExerciseSession: #Sessão para realização de um conjunto de exercícios
         self.correct_count=0 #Contagem de respostas respondidas corretamente
         self.accuracy=0 #Precisão nas respostas do conjunto de exercícios
         self.evaluation="" #Nota qualificativa do desempenho
+
+    def view_state(self):
+        return ViewState("", [], 0)
 
     def current_exercise(self): #Retorna o exercício atual
         return self.exercises[self.current_index]
@@ -146,11 +153,21 @@ class IntervalScaleSession(MultipleCSession, IntervalScaleMethods): #Sessão par
         self.audio_engine.load_piano()
         self.exercise_type = "interval_scale"
 
+    def view_state(self):
+        info=self.current_exercise_scale_info()
+        options=self.exercise_answer_options()
+        return ViewState(info, options, 0)
+
 class MidiIntervalSclSession(MIDISession, IntervalScaleMethods):
     def __init__(self,exercises, audio_engine):
         super().__init__(exercises, audio_engine)
         self.audio_engine.load_piano()
         self.exercise_type = "interval_scale"
+
+    def view_state(self):
+        info = self.current_exercise_scale_info()
+        options = []
+        return ViewState(info, options, 2)
 
     def validate_input(self):
         tonic=self.current_exercise().scale.tonic
@@ -195,6 +212,11 @@ class ProgressionSession(MultipleCSession): #Sessão para realização de exerc�
         self.audio_engine.load_piano()
         self.exercise_type="harmonic_prog"
 
+    def view_state(self):
+        info = self.current_exercise_prog_info()
+        options = self.exercise_answer_options()
+        return ViewState(info, options, 0)
+
     def play_exercise_prog(self): #Reproduz a progressão do exercício
         chords=self.current_exercise().progression.prog_chords
         self.audio_engine.play_chord_sequence(chords,2,3)
@@ -210,11 +232,21 @@ class ChordSession(MultipleCSession, ChordMethods): #Sessão para realização d
         self.audio_engine.load_piano()
         self.exercise_type="chord"
 
+    def view_state(self):
+        info = self.current_exercise_chord_info()
+        options = self.exercise_answer_options()
+        return ViewState(info, options, 0)
+
 class MidiChordSession(MIDISession, ChordMethods):
     def __init__(self,exercises, audio_engine):
         super().__init__(exercises, audio_engine)
         self.audio_engine.load_piano()
         self.exercise_type = "chord"
+
+    def view_state(self):
+        info = self.current_exercise_chord_info()
+        options = []
+        return ViewState(info, options, self.get_expected_input_len())
 
     def validate_input(self):
         chord_notes=self.current_exercise().chord.notes
