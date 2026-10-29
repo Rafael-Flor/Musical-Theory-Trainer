@@ -40,6 +40,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
 
 
     def show_config_page(self,exercise_title, exercise_code, modes): #Mostra a página de configuração
+        self.config_page.continuar.setEnabled(True)
         self.config_page.set_exercise(exercise_title, exercise_code, modes) #Atualizar página com informação do exercício
         self.pages.setCurrentWidget(self.config_page) #Mostrar a página de configuração
 
@@ -52,6 +53,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
             self.int_scale_exercise_page.enable_multiple_choice()
         self.int_scale_exercise_page.multiple_choice.set_answer_options(options)
         self.int_scale_exercise_page.multiple_choice.enable_options()
+        self.int_scale_exercise_page.set_continue_enabled(False)
         self.pages.setCurrentWidget(self.int_scale_exercise_page)
 
     def show_midi_interval_scale_page(self, scale_info, input_len):
@@ -59,12 +61,14 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         if self.int_scale_exercise_page.current_mode != "midi":
             self.int_scale_exercise_page.enable_midi()
         self.int_scale_exercise_page.midi_feedback.set_feedback_widget(input_len)
+        self.int_scale_exercise_page.set_continue_enabled(False)
         self.pages.setCurrentWidget(self.int_scale_exercise_page)
 
     def show_prog_page(self, prog_info, options):
         self.prog_exercise_page.set_current_exercise(prog_info)
         self.prog_exercise_page.multiple_choice.set_answer_options(options)
         self.prog_exercise_page.multiple_choice.enable_options()
+        self.prog_exercise_page.set_continue_enabled(False)
         self.pages.setCurrentWidget(self.prog_exercise_page)
 
     def show_mc_chord_page(self, chord_info, options):
@@ -73,6 +77,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.chord_exercise_page.set_current_exercise(chord_info)
         self.chord_exercise_page.multiple_choice.set_answer_options(options)
         self.chord_exercise_page.multiple_choice.enable_options()
+        self.chord_exercise_page.set_continue_enabled(False)
         self.pages.setCurrentWidget(self.chord_exercise_page)
 
     def show_midi_chord_page(self, chord_info, input_len):
@@ -80,6 +85,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
             self.chord_exercise_page.enable_midi()
         self.chord_exercise_page.set_current_exercise(chord_info)
         self.chord_exercise_page.midi_feedback.set_feedback_widget(input_len)
+        self.chord_exercise_page.set_continue_enabled(False)
         self.pages.setCurrentWidget(self.chord_exercise_page)
 
     def show_exercise(self, exercise_id, mode, state): #Mostra o exercício na interface
@@ -98,6 +104,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
                 self.show_rythm_page()
 
     def show_rythm_page(self):
+        self.rythm_exercise_page.set_continue_enabled(False)
         self.pages.setCurrentWidget(self.rythm_exercise_page)
 
     def set_feedback(self, txt):
@@ -109,6 +116,11 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         current_page = self.pages.currentWidget()
         if isinstance(current_page, ExPage) or isinstance(current_page, RythmExPage):
             current_page.show_feedback()
+
+    def set_continue_enabled(self, option):
+        current_page=self.pages.currentWidget()
+        if isinstance(current_page, ExPage) or isinstance(current_page, RythmExPage):
+            current_page.set_continue_enabled(option)
 
     def set_midi_feedback(self,flags):
         current_page = self.pages.currentWidget()
@@ -214,6 +226,7 @@ class ConfigPage(QtWidgets.QWidget): #Página de configuração de exercícios
                 model.item(i).setEnabled(False)
 
     def confirm_config(self): #Emite um evento com as configurações selecionadas
+        self.continuar.setEnabled(False)
         selected_exercise = self.selected_exercise
         selected_difficulty = self.set_difficulty.currentData()
         selected_exercise_num = self.set_exercise_num.currentData()
@@ -281,6 +294,9 @@ class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
         self.multiple_choice_txt.hide()
         self.multiple_choice.hide()
         self.current_mode="midi"
+
+    def set_continue_enabled(self, option):
+        self.continue_bt.setEnabled(option)
 
 class MultipleChoice(QtWidgets.QWidget):
 
@@ -451,6 +467,7 @@ class RythmExPage(QtWidgets.QWidget):
 
         self.continue_bt = QtWidgets.QPushButton("Continuar")
         self.continue_bt.clicked.connect(lambda: self.explanation_requested.emit())
+        self.continue_bt.setEnabled(False)
 
         self.answer_bt=QtWidgets.QPushButton("Tap")
         self.answer_bt.clicked.connect(lambda: self.answer_button_pressed.emit())
@@ -472,6 +489,9 @@ class RythmExPage(QtWidgets.QWidget):
 
     def show_feedback(self):  # Mostra o feedback da resposta
         self.feedback.show()
+
+    def set_continue_enabled(self, option):
+        self.continue_bt.setEnabled(option)
 
 
 class ExplanationPage(QtWidgets.QWidget):
