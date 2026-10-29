@@ -111,12 +111,14 @@ class Main:
         if session.exercise_answered:
             feedback=session.get_last_rating_feedback()
             self.window.set_feedback(feedback)
+            self.window.show_feedback()
             self.window.set_continue_enabled(True)
 
     def on_midi_input(self, midi_key):
         session = self.exercise_manager.exercise_session
         session.receive_input(midi_key)
         self.window.set_feedback(session.last_feedback)
+        self.window.show_feedback()
         self.window.set_midi_feedback(session.get_input_feedback())
         if session.exercise_answered:
             self.window.set_continue_enabled(True)

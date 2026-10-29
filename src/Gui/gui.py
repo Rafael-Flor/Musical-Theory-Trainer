@@ -53,6 +53,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
             self.int_scale_exercise_page.enable_multiple_choice()
         self.int_scale_exercise_page.multiple_choice.set_answer_options(options)
         self.int_scale_exercise_page.multiple_choice.enable_options()
+        self.int_scale_exercise_page.feedback.hide()
         self.int_scale_exercise_page.set_continue_enabled(False)
         self.pages.setCurrentWidget(self.int_scale_exercise_page)
 
@@ -61,6 +62,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         if self.int_scale_exercise_page.current_mode != "midi":
             self.int_scale_exercise_page.enable_midi()
         self.int_scale_exercise_page.midi_feedback.set_feedback_widget(input_len)
+        self.int_scale_exercise_page.feedback.hide()
         self.int_scale_exercise_page.set_continue_enabled(False)
         self.pages.setCurrentWidget(self.int_scale_exercise_page)
 
@@ -68,6 +70,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.prog_exercise_page.set_current_exercise(prog_info)
         self.prog_exercise_page.multiple_choice.set_answer_options(options)
         self.prog_exercise_page.multiple_choice.enable_options()
+        self.prog_exercise_page.feedback.hide()
         self.prog_exercise_page.set_continue_enabled(False)
         self.pages.setCurrentWidget(self.prog_exercise_page)
 
@@ -77,6 +80,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.chord_exercise_page.set_current_exercise(chord_info)
         self.chord_exercise_page.multiple_choice.set_answer_options(options)
         self.chord_exercise_page.multiple_choice.enable_options()
+        self.chord_exercise_page.feedback.hide()
         self.chord_exercise_page.set_continue_enabled(False)
         self.pages.setCurrentWidget(self.chord_exercise_page)
 
@@ -85,6 +89,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
             self.chord_exercise_page.enable_midi()
         self.chord_exercise_page.set_current_exercise(chord_info)
         self.chord_exercise_page.midi_feedback.set_feedback_widget(input_len)
+        self.chord_exercise_page.feedback.hide()
         self.chord_exercise_page.set_continue_enabled(False)
         self.pages.setCurrentWidget(self.chord_exercise_page)
 
@@ -104,6 +109,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
                 self.show_rythm_page()
 
     def show_rythm_page(self):
+        self.rythm_exercise_page.feedback.hide()
         self.rythm_exercise_page.set_continue_enabled(False)
         self.pages.setCurrentWidget(self.rythm_exercise_page)
 
