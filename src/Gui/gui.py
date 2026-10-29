@@ -124,7 +124,9 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.pages.setCurrentWidget(self.evaluation_page)
 
 class MainMenu(QtWidgets.QWidget): #Página do menu principal
-    exercise_selected = QtCore.Signal(str, str, tuple) #Sinal a emitir quando um exercício for selecionado
+
+    exercise_selected = QtCore.Signal(str, str, tuple)  # Sinal a emitir quando um exercício for selecionado
+
     def __init__(self):
         super().__init__()
 
@@ -210,10 +212,13 @@ class ConfigPage(QtWidgets.QWidget): #Página de configuração de exercícios
         self.exercise_configured.emit(selected_exercise,selected_difficulty,selected_exercise_num,selected_mode)
 
 class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
-    #Criar eventos
-    explanation_requested = Event() #Pedir explicação do exercício
+
     def __init__(self):
         super().__init__()
+
+        # Criar eventos
+        self.explanation_requested = Event()  # Pedir explicação do exercício
+
         self.current_mode=""
 
         self.layout = QtWidgets.QVBoxLayout(self)
@@ -263,9 +268,11 @@ class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
 
 
 class MultipleChoice(QtWidgets.QWidget):
-    answer_submited = Event() #Resposta foi submetida
+
     def __init__(self):
         super().__init__()
+
+        self.answer_submited = Event()  # Resposta foi submetida
 
         self.buttons = []
 
@@ -337,11 +344,12 @@ class MIDI_feedback(QtWidgets.QWidget):
 
 class IntervalScaleExPage(ExPage): #Página para resolução de exercícios de reconhecimento de intervalos em escalas
 
-    tonic_playback_requested = Event()  # Pedir reprodução da tónica
-    interval_note_playback_requested = Event()  # Pedir reprodução da nota do intervalo
-
     def __init__(self):
         super().__init__()
+
+        self.tonic_playback_requested = Event()  # Pedir reprodução da tónica
+        self.interval_note_playback_requested = Event()  # Pedir reprodução da nota do intervalo
+
         self.title.setText("Exercício de reconhecimento de intervalos em escalas")
         self.instructions.setText("Clique nos botões abaixo para reproduzir as notas do exercício")
         self.multiple_choice_txt.setText("Selecione o grau da nota do intervalo:")
@@ -361,10 +369,11 @@ class IntervalScaleExPage(ExPage): #Página para resolução de exercícios de r
 
 class ProgExPage(ExPage): #Página para resolução de exercícios de reconhecimento de progressões harmónicas
 
-    prog_playback_requested = Event()
-
     def __init__(self):
         super().__init__()
+
+        self.prog_playback_requested = Event()
+
         self.title.setText("Exercício de reconhecimento de progressões harmónicas:")
         self.instructions.setText("Clique nos botões abaixo para reproduzir a progressão do exercício:")
         self.multiple_choice_txt.setText("Selecione o tipo de progressão reproduzida:")
@@ -380,10 +389,11 @@ class ProgExPage(ExPage): #Página para resolução de exercícios de reconhecim
 
 class ChordExPage(ExPage): #Página para resolução de exercícios de reconhecimento de acordes
 
-    chord_playback_requested = Event()
-
     def __init__(self):
         super().__init__()
+
+        self.chord_playback_requested = Event()
+
         self.title.setText("Exercício de reconhecimento de acordes:")
         self.instructions.setText("Clique no botão abaixo para reproduzir o acorde do exercício:")
         self.midi_txt.setText("Introduza o acorde reproduzido no dispositivo MIDI:")
@@ -399,13 +409,14 @@ class ChordExPage(ExPage): #Página para resolução de exercícios de reconheci
         self.chord_info.setText(chord_info)
 
 class RythmExPage(QtWidgets.QWidget):
-    # Criar eventos
-    explanation_requested = Event()  # Pedir explicação do exercício
-    rythm_plyback_requested = Event()
-    answer_button_pressed = Event()
 
     def __init__(self):
         super().__init__()
+
+        # Criar eventos
+        self.explanation_requested = Event()  # Pedir explicação do exercício
+        self.rythm_plyback_requested = Event()
+        self.answer_button_pressed = Event()
 
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.setAlignment(QtCore.Qt.AlignTop)
@@ -440,9 +451,11 @@ class RythmExPage(QtWidgets.QWidget):
 
 
 class ExplanationPage(QtWidgets.QWidget):
-    next_exercise_requested = Event()
+
     def __init__(self):
         super().__init__()
+
+        self.next_exercise_requested = Event()
 
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.setAlignment(QtCore.Qt.AlignTop)
@@ -460,9 +473,11 @@ class ExplanationPage(QtWidgets.QWidget):
         self.explanation.setText(explanation)
 
 class EvaluationPage(QtWidgets.QWidget): #Página para apresentação da avaliação de desempenho
-    eval_continue_pressed = Event()
+
     def __init__(self):
         super().__init__()
+
+        self.eval_continue_pressed = Event()
 
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.setAlignment(QtCore.Qt.AlignTop)
