@@ -146,9 +146,6 @@ class MainMenu(QtWidgets.QWidget): #Página do menu principal
             button.clicked.connect(lambda checked=False, ex=exercise: self.exercise_selected.emit(ex["title"], ex["id"], ex["modes"]))
             self.layout.addWidget(button)
 
-
-
-
 class ConfigPage(QtWidgets.QWidget): #Página de configuração de exercícios
 
     def __init__(self):
@@ -414,8 +411,8 @@ class RythmExPage(QtWidgets.QWidget):
         self.layout.setAlignment(QtCore.Qt.AlignTop)
         self.layout.setContentsMargins(0, 50, 0, 0)
 
-        self.title = QtWidgets.QLabel("")
-        self.instructions = QtWidgets.QLabel("")
+        self.title = QtWidgets.QLabel("Exercício de reconhecimento e execução de ritmo")
+        self.instructions = QtWidgets.QLabel("Utilize o botão abaixo para reproduzir o ritmo, de seguida introduza o ritmo utilizando o botão 'Tap'")
 
         self.feedback = QtWidgets.QLabel("")
 
@@ -425,7 +422,7 @@ class RythmExPage(QtWidgets.QWidget):
         self.continue_bt = QtWidgets.QPushButton("Continuar")
         self.continue_bt.clicked.connect(lambda: self.explanation_requested.emit())
 
-        self.answer_bt=QtWidgets.QPushButton(".")
+        self.answer_bt=QtWidgets.QPushButton("Tap")
         self.answer_bt.clicked.connect(lambda: self.answer_button_pressed.emit())
 
         self.layout.addWidget(self.title)
