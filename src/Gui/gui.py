@@ -155,6 +155,7 @@ class ConfigPage(QtWidgets.QWidget): #Página de configuração de exercícios
 
         # Eventos a emitir ao exterior
         self.exercise_configured = Event()
+        self.menu_requested=Event()
 
         self.selected_exercise=None # Id do exercício selecionado
 
@@ -180,6 +181,7 @@ class ConfigPage(QtWidgets.QWidget): #Página de configuração de exercícios
         self.set_mode.addItem("Interface","gui")
         self.set_mode.addItem("Dispositivo MIDI","midi")
 
+        self.menu=QtWidgets.QPushButton("Menu")
         self.continuar = QtWidgets.QPushButton("Continuar")
 
         #Adicionar elementos ao layout da página
@@ -187,8 +189,15 @@ class ConfigPage(QtWidgets.QWidget): #Página de configuração de exercícios
         self.layout.addWidget(self.set_difficulty)
         self.layout.addWidget(self.set_exercise_num)
         self.layout.addWidget(self.set_mode)
-        self.layout.addWidget(self.continuar)
+        self.layout.addStretch()
 
+        self.h_layout = QtWidgets.QHBoxLayout()
+        self.h_layout.addWidget(self.menu)
+        self.h_layout.addWidget(self.continuar)
+
+        self.layout.addLayout(self.h_layout)
+
+        self.menu.clicked.connect(lambda: self.menu_requested.emit())
         self.continuar.clicked.connect(self.confirm_config)
 
 
@@ -218,6 +227,7 @@ class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
 
         # Criar eventos
         self.explanation_requested = Event()  # Pedir explicação do exercício
+        self.menu_requested = Event()
 
         self.current_mode=""
 
@@ -236,6 +246,7 @@ class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
 
         self.feedback=QtWidgets.QLabel("")
 
+        self.menu = QtWidgets.QPushButton("Menu")
         self.continue_bt=QtWidgets.QPushButton("Continuar")
         self.continue_bt.clicked.connect(lambda: self.explanation_requested.emit())
 
@@ -246,7 +257,13 @@ class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
         self.layout.addWidget(self.midi_txt)
         self.layout.addWidget(self.midi_feedback)
         self.layout.addWidget(self.feedback)
-        self.layout.addWidget(self.continue_bt)
+        self.layout.addStretch()
+
+        self.h_layout = QtWidgets.QHBoxLayout()
+        self.h_layout.addWidget(self.menu)
+        self.h_layout.addWidget(self.continue_bt)
+        self.layout.addLayout(self.h_layout)
+        self.menu.clicked.connect(lambda: self.menu_requested.emit())
 
     def set_feedback(self, feedback): #Atualiza o feedback da resposta
         self.feedback.setText(feedback)
@@ -264,8 +281,6 @@ class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
         self.multiple_choice_txt.hide()
         self.multiple_choice.hide()
         self.current_mode="midi"
-
-
 
 class MultipleChoice(QtWidgets.QWidget):
 
@@ -417,6 +432,7 @@ class RythmExPage(QtWidgets.QWidget):
         self.explanation_requested = Event()  # Pedir explicação do exercício
         self.rythm_plyback_requested = Event()
         self.answer_button_pressed = Event()
+        self.menu_requested = Event()
 
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.setAlignment(QtCore.Qt.AlignTop)
@@ -430,6 +446,9 @@ class RythmExPage(QtWidgets.QWidget):
         self.rythm_bt=QtWidgets.QPushButton("Reproduzir Ritmo")
         self.rythm_bt.clicked.connect(lambda: self.rythm_plyback_requested.emit())
 
+        self.menu = QtWidgets.QPushButton("Menu")
+        self.menu.clicked.connect(lambda: self.menu_requested.emit())
+
         self.continue_bt = QtWidgets.QPushButton("Continuar")
         self.continue_bt.clicked.connect(lambda: self.explanation_requested.emit())
 
@@ -441,7 +460,12 @@ class RythmExPage(QtWidgets.QWidget):
         self.layout.addWidget(self.rythm_bt)
         self.layout.addWidget(self.answer_bt)
         self.layout.addWidget(self.feedback)
-        self.layout.addWidget(self.continue_bt)
+        self.layout.addStretch()
+
+        self.h_layout = QtWidgets.QHBoxLayout()
+        self.h_layout.addWidget(self.menu)
+        self.h_layout.addWidget(self.continue_bt)
+        self.layout.addLayout(self.h_layout)
 
     def set_feedback(self, feedback):  # Atualiza o feedback da resposta
         self.feedback.setText(feedback)
@@ -456,6 +480,7 @@ class ExplanationPage(QtWidgets.QWidget):
         super().__init__()
 
         self.next_exercise_requested = Event()
+        self.menu_requested = Event()
 
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.setAlignment(QtCore.Qt.AlignTop)
@@ -465,9 +490,17 @@ class ExplanationPage(QtWidgets.QWidget):
         self.explanation.setFont(QtGui.QFont("Noto Sans Symbols 2", 10))
         self.continue_bt=QtWidgets.QPushButton("Continuar")
         self.continue_bt.clicked.connect(lambda : self.next_exercise_requested.emit())
+        self.menu = QtWidgets.QPushButton("Menu")
+        self.menu.clicked.connect(lambda: self.menu_requested.emit())
 
         self.layout.addWidget(self.explanation)
         self.layout.addWidget(self.continue_bt)
+        self.layout.addStretch()
+
+        self.h_layout = QtWidgets.QHBoxLayout()
+        self.h_layout.addWidget(self.menu)
+        self.h_layout.addWidget(self.continue_bt)
+        self.layout.addLayout(self.h_layout)
 
     def set_explanation(self, explanation):
         self.explanation.setText(explanation)
