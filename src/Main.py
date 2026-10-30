@@ -19,7 +19,7 @@ class Main:
         #Inicializar interface gráfica
         self.app = QtWidgets.QApplication([])
         self.window = MainWindow()
-        self.window.resize(800, 600)
+        self.window.setFixedSize(900, 700)
         self.window.main_menu.set_main_menu(EXERCISES)
         self.window.show()
 
