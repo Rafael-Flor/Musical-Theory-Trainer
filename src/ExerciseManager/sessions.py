@@ -128,7 +128,7 @@ class IntervalScaleMethods: #Métodos para os exercícios de reconhecimento de i
 
     def current_exercise_scale_info(self): #Retorna o nome da escala
         exercise=self.exercises[self.current_index]
-        return f"Escala {exercise.scale.tonic.name} {exercise.scale.scale_type.name}"
+        return f"Escala {exercise.scale.tonic.name} {exercise.scale.scale_type.description}"
 
 class ChordMethods:  #Métodos para os exercícios de reconhecimento de acordes
 
@@ -219,7 +219,7 @@ class ProgressionSession(MultipleCSession): #Sessão para realização de exerc�
     def current_exercise_prog_info(self): #Obtem informação sobre a progressão (tonalidade)
         exercise=self.current_exercise()
         prog=exercise.progression
-        return f"Tonalidade {prog.scale.tonic.name} {prog.scale.scale_type.name}"
+        return f"Tonalidade {prog.scale.tonic.name} {prog.scale.scale_type.description}"
 
 class ChordSession(MultipleCSession, ChordMethods): #Sessão para realização de exercícios de acordes
     def __init__(self,exercises, audio_engine):
