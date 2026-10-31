@@ -1,0 +1,131 @@
+
+
+QPushButton:hover {
+    background-color: rgb(41,51,63);
+}
+
+QPushButton:pressed{
+    background-color: rgb(28, 36, 46);
+    padding-top: 12px;
+    padding-bottom: 8px;
+}
+
+QComboBox:hover{
+    background-color: rgb(41,51,63);
+}
+
+MainMenu QPushButton{
+    text-align: left;
+    font-size: 20px;
+    padding: 12px 20px;
+    margin-bottom: 8px;
+    margin-left:10px;
+    margin-right: 10px;
+}
+
+QLabel#menu_title{
+    qproperty-alignment:AlignCenter;
+    font-size: 50px;
+    margin-bottom:100px;
+}
+
+ConfigPage QLabel#title{
+    font-size: 30px;
+    font-weight: 600;
+    margin-bottom: 50px;
+}
+
+ExplanationPage QLabel#title{
+    font-size: 30px;
+    font-weight: 600;
+    margin-bottom: 50px;
+}
+
+ConfigPage QLabel#combo_label{
+    font-size: 20px;
+    margin-top: 8px;
+}
+
+ConfigPage QComboBox{
+    min-height: 30px;
+    padding: 5px 10px;
+    font-size: 15px;
+}
+
+QPushButton#menu_bt, QPushButton#continue_bt{
+    min-width: 300px;
+    padding: 10px 15px;
+    font-size: 15px;
+}
+
+ExPage QLabel#title, RythmExPage QLabel#title{
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+ExPage QLabel#instructions, RythmExPage QLabel#instructions{
+    font-size: 15px;
+    margin-bottom: 15px;
+}
+
+ExPage QLabel#about_ex{
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 15px;
+}
+
+
+ExPage QLabel#helper_txt{
+    font-size: 15px;
+    margin-bottom: 15px;
+}
+
+ExPage QLabel#feedback, RythmExPage QLabel#feedback{
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 15px;
+}
+
+MultipleChoice QPushButton
+{
+    min-width: 50px;
+    padding: 10px 15px;
+    font-size: 15px;
+}
+
+QPushButton#play_bt{
+    min-width: 300px;
+    padding: 10px 15px;
+    font-size: 15px;
+    background-color: rgb(55,106,140);
+}
+
+QPushButton#play_bt:hover{
+    background-color: rgb(45,96,130);
+}
+
+QPushButton#play_bt:pressed{
+    background-color: rgb(35,76,110);
+    padding-top: 12px;
+    padding-bottom: 8px;
+}
+
+
+ExplanationPage QLabel#explanation{
+    font-family: "Noto Sans Symbols 2";
+    font-size: 15px;
+    line-height: 300%;
+    padding: 15px 10px;
+}
+
+RythmExPage QPushButton#tap_bt{
+    min-width: 300px;
+    padding: 10px 15px;
+    font-size: 15px;
+}
+
+
+
+
+

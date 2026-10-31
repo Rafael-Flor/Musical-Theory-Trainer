@@ -19,7 +19,7 @@ class Main:
         #Inicializar interface gráfica
         self.app = QtWidgets.QApplication([])
         self.window = MainWindow()
-        self.window.resize(800, 600)
+        self.window.setFixedSize(900, 700)
         self.window.main_menu.set_main_menu(EXERCISES)
         self.window.show()
 
@@ -34,26 +34,38 @@ class Main:
 
         #Conectar os eventos da interface às ações a tomar
         self.config_screen.exercise_configured.subscribe(self.start_exercises)
+        self.config_screen.menu_requested.subscribe(self.show_menu)
         self.i_s_screen.tonic_playback_requested.subscribe(self.play_i_s_tonic)
         self.i_s_screen.interval_note_playback_requested.subscribe(self.play_i_s_interval_note)
         self.i_s_screen.multiple_choice.answer_submited.subscribe(self.process_mc_answer)
         self.i_s_screen.explanation_requested.subscribe(self.show_explanation)
+        self.i_s_screen.menu_requested.subscribe(self.abandon_and_show_menu)
         self.explain_screen.next_exercise_requested.subscribe(self.next_exercise)
+        self.explain_screen.menu_requested.subscribe(self.abandon_and_show_menu)
         self.eval_screen.eval_continue_pressed.subscribe(self.show_menu)
         self.p_screen.prog_playback_requested.subscribe(self.play_p_rogression)
         self.p_screen.multiple_choice.answer_submited.subscribe(self.process_mc_answer)
         self.p_screen.explanation_requested.subscribe(self.show_explanation)
+        self.p_screen.menu_requested.subscribe(self.abandon_and_show_menu)
         self.c_screen.chord_playback_requested.subscribe(self.play_c_chord)
         self.c_screen.multiple_choice.answer_submited.subscribe(self.process_mc_answer)
         self.c_screen.explanation_requested.subscribe(self.show_explanation)
+        self.c_screen.menu_requested.subscribe(self.abandon_and_show_menu)
         self.r_screen.rythm_plyback_requested.subscribe(self.play_r_rythm)
         self.r_screen.answer_button_pressed.subscribe(self.process_r_input)
         self.r_screen.explanation_requested.subscribe(self.show_explanation)
-
+        self.r_screen.menu_requested.subscribe(self.abandon_and_show_menu)
 
 
     def show_menu(self): #Mostra menu de seleção de exercícios
         self.window.show_menu()
+
+    def abandon_and_show_menu(self):
+        session=self.exercise_manager.exercise_session
+        if session is not None and session.mode=="midi":
+            self.midi_listener.midi_key_pressed.unsubscribe(self.on_midi_input)
+            self.midi_listener.stop_listening()
+        self.show_menu()
 
     def start_exercises(self, selected_exercise, selected_difficulty, selected_exercise_num, selected_mode):
         self.exercise_manager.create_exercise_session(selected_exercise, selected_difficulty, selected_exercise_num, selected_mode) #Criar sessão com as configurações selecionadas na interface
@@ -88,6 +100,7 @@ class Main:
             self.window.set_feedback("Certo!")
         else:
             self.window.set_feedback("Errado!")
+        self.window.set_continue_enabled(True)
         self.window.show_feedback()
 
     def process_r_input(self):
@@ -98,13 +111,17 @@ class Main:
         if session.exercise_answered:
             feedback=session.get_last_rating_feedback()
             self.window.set_feedback(feedback)
+            self.window.show_feedback()
+            self.window.set_continue_enabled(True)
 
     def on_midi_input(self, midi_key):
         session = self.exercise_manager.exercise_session
         session.receive_input(midi_key)
         self.window.set_feedback(session.last_feedback)
+        self.window.show_feedback()
         self.window.set_midi_feedback(session.get_input_feedback())
-
+        if session.exercise_answered:
+            self.window.set_continue_enabled(True)
 
     def play_i_s_tonic(self):
         session = self.exercise_manager.exercise_session
