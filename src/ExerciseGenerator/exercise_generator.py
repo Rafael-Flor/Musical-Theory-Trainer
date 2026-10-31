@@ -166,7 +166,7 @@ class ExerciseGenerator: #Gerador de exercicios
 
     def generate_scale_interval_explanation(self, scale, interval_note): #Constroi a explicação para o exercicio de intervalos
         tonic=scale.tonic.name
-        scale_type=scale.scale_type.name
+        scale_type=scale.scale_type.description
         intervals = "|".join( str(interval) for interval in scale.scale_type.note_steps)
         note_names = "|".join(note.name for note in scale.notes)
         index=scale.notes.index(interval_note)
@@ -265,15 +265,15 @@ class ExerciseGenerator: #Gerador de exercicios
 
     def generate_prog_explanation(self, progression): #Constroi a explicação para o exercício de progressão harmónica
         tonic=progression.scale.tonic.name
-        scale_type=progression.scale.scale_type.name
+        scale_type=progression.scale.scale_type.description
         prog_name=progression.prog_type.name
         prog_type=progression.prog_type
         degrees_exp=""
         for i in range(len(prog_type.chord_types)):
-            degrees_exp=degrees_exp+f"Um acorde do tipo {prog_type.chord_types[i]} no {prog_type.prog_degrees[i]}º grau da escala\n"
+            degrees_exp=degrees_exp+f"Um acorde do tipo {progression.prog_chords[i].chord_type.description} no {prog_type.prog_degrees[i]}º grau da escala\n"
         chords_exp=""
         for chord in progression.prog_chords:
-            chords_exp=chords_exp+f"{chord.tonic.name} {chord.chord_type.name}  "
+            chords_exp=chords_exp+f"{chord.tonic.name}{chord.chord_type.symbol} ({chord.chord_type.description})\n"
 
         explanation=(f"A progressão |{prog_name}| do exercício ocorre na escala de {tonic} {scale_type}\n"
                      f"Uma progressão |{prog_name}| é contruida a partir de :\n"
@@ -323,10 +323,11 @@ class ExerciseGenerator: #Gerador de exercicios
 
     def generate_chord_explanation(self, chord): #Constroi a explicação para o exercicio de acordes
         tonic=chord.tonic.name
-        chord_type=chord.chord_type.name
+        chord_type=chord.chord_type.description
+        symbol=chord.chord_type.symbol
         intervals = "|".join( str(interval) for interval in chord.chord_type.note_steps)
         note_names = "|".join(note.name for note in chord.notes)
-        explanation=(f"O acorde do exercício é {tonic} {chord_type}\n"
+        explanation=(f"O acorde do exercício é {tonic}{symbol} ({chord_type})\n"
                      f"Uma acorde {chord_type} é construido aplicando a seguinte série de intervalos entre notas consecutivas:\n"
                      f"{intervals}\n"
                      f"Para a tónica {tonic} a aplicação dos intervalos resulta na obtenção das notas do acorde:\n"
@@ -390,7 +391,7 @@ class ExerciseGenerator: #Gerador de exercicios
         for i, measure in enumerate(rythm.measures, start=1):
             measure_ex+=f"O {i}º compasso é composto pelas seguintes notas:\n"
             for unit in measure:
-                measure_ex+=f"{unit.name} Note {unit.symbol} "
+                measure_ex+=f"{unit.description} {unit.symbol} "
             measure_ex+="\n"
         explanation = (f"A fórmula de compasso do exercício é {compass}\n"
                        f"O ritmo reproduzido é composto por {measure_n} compassos\n"
