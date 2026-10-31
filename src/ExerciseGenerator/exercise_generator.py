@@ -285,7 +285,9 @@ class ExerciseGenerator: #Gerador de exercicios
 
     def generate_chord_exercise(self, difficulty, generate_options=True):
         chord = self.generate_chord(difficulty)
-        chord_type_name=chord.chord_type.name
+        tonic=chord.tonic.name
+        chord_type_symbol=chord.chord_type.symbol
+        correct_answer=tonic+chord_type_symbol
 
         if generate_options:
             wrong_options = self.generate_chord_wrong_options(chord, difficulty)
@@ -294,7 +296,7 @@ class ExerciseGenerator: #Gerador de exercicios
 
         explanation = self.generate_chord_explanation(chord)
 
-        return ChordExercise(chord, "Reconhecimento de acordes", chord_type_name, wrong_options, explanation)
+        return ChordExercise(chord, "Reconhecimento de acordes", correct_answer, wrong_options, explanation)
 
     def generate_chord(self, difficulty):
         tonic = random.choice(self.theory_model.TONICS)  # Escolher uma nota aleatoria para ser a tónica do acorde
@@ -311,13 +313,14 @@ class ExerciseGenerator: #Gerador de exercicios
         return random.choice(possible_chords)
 
     def generate_chord_wrong_options(self, chord, difficulty): #Gera as opcões de resposta para os exercicios de acordes
-        chord_type=chord.chord_type.name
+        chord_type=chord.chord_type
         allowed_types=self.chord_difficulty_settings[difficulty]
         option_num=min(len(allowed_types)-1, 3)
         options= set()
         while len(options) < option_num:
-            option=random.choice(allowed_types)
-            if option != chord_type:
+            option_type=self.get_chord_type(random.choice(allowed_types))
+            if option_type != chord_type:
+                option=chord.tonic.name+option_type.symbol
                 options.add(option)
         return list(options)
 
