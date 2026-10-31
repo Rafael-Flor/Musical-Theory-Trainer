@@ -29,16 +29,19 @@ class ChordProg: #Progressão Harmónica
         self.prog_chords=prog_chords
 
 class ScaleType: #Formato genérico para um tipo de escala
-    def __init__(self, name, scale_degrees, note_steps):
+    def __init__(self, name, scale_degrees, note_steps, description):
         self.name=name
-        self.scale_degrees = scale_degrees #graus da escala
+        self.scale_degrees = scale_degrees #graus em relação à escala diatónica mãe
         self.note_steps=note_steps #intervalos entre graus da escala, em semitons
+        self.description=description
 
 class ChordType: #Formato genérico para um tipo de acorde
-    def __init__(self, name, chord_degrees, note_steps):
+    def __init__(self, name, chord_degrees, note_steps, symbol, description):
         self.name=name
         self.chord_degrees=chord_degrees
         self.note_steps=note_steps
+        self.symbol=symbol
+        self.description=description
 
 class ChordProgType: #Formato genérico para um tipo de progressão harmónica
     def __init__(self, name, chord_types, prog_degrees):
@@ -54,10 +57,11 @@ class ProgDegreeSet: #Conjunto de graus que podem compor uma progressão harmón
         self.mode=mode
 
 class RythmUnit: #Unidade rítmica para construir ritmos
-    def __init__(self, name, duration, symbol):
+    def __init__(self, name, duration, symbol, description):
         self.name=name
         self.duration=duration
         self.symbol=symbol
+        self.description=description
 
 class Rythm:
     def __init__(self, compass, measures):
@@ -88,24 +92,24 @@ class MusicTheoryModel:
         Note(11, "B"))
     def __init__(self):
         self.scale_types=[          #Definição dos tipos de escala do modelo
-            ScaleType("Major", [1, 2, 3, 4, 5, 6, 7], [2, 2, 1, 2, 2, 2, 1]),
-            ScaleType("Minor", [1, 2, 3, 4, 5, 6, 7], [2, 1, 2, 2, 1, 2, 2]),
-            ScaleType("Major Pentatonic", [1, 2, 3, 5, 6], [2, 2, 3, 2]),
-            ScaleType("Minor Pentatonic", [1, 3, 4, 5, 7], [3, 2, 2, 3]),
-            ScaleType("Mixolydian", [1, 2, 3, 4, 5, 6, 7], [2, 2, 1, 2, 2, 1, 2]),
-            ScaleType("Dorian", [1, 2, 3, 4, 5, 6, 7],[2, 1, 2, 2, 2, 1, 2])
+            ScaleType("Major", [1, 2, 3, 4, 5, 6, 7], [2, 2, 1, 2, 2, 2, 1], "Maior"),
+            ScaleType("Minor", [1, 2, 3, 4, 5, 6, 7], [2, 1, 2, 2, 1, 2, 2], "Menor"),
+            ScaleType("Major Pentatonic", [1, 2, 3, 5, 6], [2, 2, 3, 2], "Pentatónica maior"),
+            ScaleType("Minor Pentatonic", [1, 3, 4, 5, 7], [3, 2, 2, 3], "Pentatónica menor"),
+            ScaleType("Mixolydian", [1, 2, 3, 4, 5, 6, 7], [2, 2, 1, 2, 2, 1, 2], "Mixolídia"),
+            ScaleType("Dorian", [1, 2, 3, 4, 5, 6, 7],[2, 1, 2, 2, 2, 1, 2], "Dórica")
         ]
         self.chord_types=[          #Definição dos tipos de acordes do modelo
-            ChordType("Major", [1, 3, 5], [4,3]),
-            ChordType("Minor", [1, 3, 5], [3, 4]),
-            ChordType("Major7", [1, 3, 5, 7], [4, 3, 4]),
-            ChordType("Minor7", [1, 3, 5, 7], [3, 4, 3]),
-            ChordType("7", [1, 3, 5, 7], [4,3, 3]),
-            ChordType("Diminished", [1, 3, 5], [3, 3]),
-            ChordType("Diminished7", [1, 3, 5, 7], [3, 3, 3]),
-            ChordType("Halfdiminished7", [1, 3, 5, 7], [3, 3, 4]),
-            ChordType("Sus2", [1, 2, 5], [2, 5]),
-            ChordType("Sus4", [1, 4, 5], [5, 2]),
+            ChordType("Major", [1, 3, 5], [4,3], "", "Maior"),
+            ChordType("Minor", [1, 3, 5], [3, 4], "m", "Menor"),
+            ChordType("Major7", [1, 3, 5, 7], [4, 3, 4], "maj7", "Maior com sétima maior"),
+            ChordType("Minor7", [1, 3, 5, 7], [3, 4, 3], "m7", "Menor com sétima"),
+            ChordType("7", [1, 3, 5, 7], [4,3, 3], "7", "Sétima (dominante)"),
+            ChordType("Diminished", [1, 3, 5], [3, 3], "dim", "Diminuto"),
+            ChordType("Diminished7", [1, 3, 5, 7], [3, 3, 3], "dim7", "Diminuto com sétima diminuta"),
+            ChordType("Halfdiminished7", [1, 3, 5, 7], [3, 3, 4], "ø", "Meio-diminuto"),
+            ChordType("Sus2", [1, 2, 5], [2, 5], "sus2", "Suspenso 2"),
+            ChordType("Sus4", [1, 4, 5], [5, 2], "sus4", "Suspenso 4"),
         ]
         self.prog_degrees=[     #Definição dos conjuntos de graus para compor progressões harmónicas
             ProgDegreeSet("MajorDiatonics",{"I": "Major", "ii": "Minor", "iii": "Minor", "IV": "Major", "V": "Major", "vi": "Minor","viiº": "Diminished"},[1,2,3,4,5,6,7],"Major"),
@@ -118,11 +122,11 @@ class MusicTheoryModel:
             ProgDegreeSet("MinorSus4", {"isus4": "Sus4", "iisus4": "Sus4", "ivsus4": "Sus4", "vsus4": "Sus4"},[1, 2, 4, 5], "Minor")
         ]
         self.rythm_units=[      #Definição de unidades ritmicas
-            RythmUnit("Whole", 1, "𝅝"),
-            RythmUnit("Half", 1/2, "𝅗𝅥"),
-            RythmUnit("Quarter", 1/4, "𝅘𝅥"),
-            RythmUnit("Eighth", 1/8,"♪"),
-            RythmUnit("Sixteenth", 1/16, "𝅘𝅥𝅯")
+            RythmUnit("Whole", 1, "𝅝", "Semibreve"),
+            RythmUnit("Half", 1/2, "𝅗𝅥", "Mínima"),
+            RythmUnit("Quarter", 1/4, "𝅘𝅥", "Semínima"),
+            RythmUnit("Eighth", 1/8,"♪", "Colcheia"),
+            RythmUnit("Sixteenth", 1/16, "𝅘𝅥𝅯", "Semicolcheia")
         ]
 
 
