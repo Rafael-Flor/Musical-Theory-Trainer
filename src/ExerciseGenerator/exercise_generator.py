@@ -431,13 +431,16 @@ class ExerciseGenerator: #Gerador de exercicios
         measure_n=len(rythm.measures)
         measure_ex = ""
         for i, measure in enumerate(rythm.measures, start=1):
-            measure_ex+=f"O {i}º compasso é composto pelas seguintes notas:\n"
+            measure_ex+=f"-⮞ No {i}º compasso:  "
             for unit in measure:
-                measure_ex+=f"{unit.description} {unit.symbol} "
+                measure_ex+=f"Uma {unit.description} {unit.symbol}; "
             measure_ex+="\n"
-        explanation = (f"A fórmula de compasso do exercício é {compass}\n"
-                       f"O ritmo reproduzido é composto por {measure_n} compassos\n"
-                       f"{measure_ex}\n")
+        explanation = f"O ritmo está na fórmula {compass} e ocupa {measure_n}"
+        if measure_n == 1:
+            explanation+=" compasso.\n"
+        else:
+            explanation+=" compassos.\n"
+        explanation+=f"O ritmo reproduzido é composto por:\n {measure_ex}\n"
         return explanation
 
 
