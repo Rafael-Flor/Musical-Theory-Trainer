@@ -288,19 +288,30 @@ class ExerciseGenerator: #Gerador de exercicios
         tonic=progression.scale.tonic.name
         scale_type=progression.scale.scale_type.description
         prog_name=progression.prog_type.name
-        prog_type=progression.prog_type
-        degrees_exp=""
-        for i in range(len(prog_type.chord_types)):
-            degrees_exp=degrees_exp+f"Um acorde do tipo {progression.prog_chords[i].chord_type.description} no {prog_type.prog_degrees[i]}º grau da escala\n"
-        chords_exp=""
-        for chord in progression.prog_chords:
-            chords_exp=chords_exp+f"{chord.tonic.name}{chord.chord_type.symbol} ({chord.chord_type.description})\n"
+        prog_numerals=prog_name.split("-")
+        scale=progression.scale
+        chords=progression.prog_chords
 
-        explanation=(f"A progressão |{prog_name}| do exercício ocorre na escala de {tonic} {scale_type}\n"
-                     f"Uma progressão |{prog_name}| é contruida a partir de :\n"
-                     f"{degrees_exp}\n"
-                     f"Na escala de {tonic} {scale_type} esses acordes são:\n"
-                     f"{chords_exp}\n")
+        notes = []
+        for i in range(len(scale.notes)):
+            notes.append(f"{scale.notes[i].name} ({scale.scale_type.scale_degrees[i]}º)")
+        if len(notes) == 1:
+            notes_txt = notes[0]
+        else:
+            notes_txt = ", ".join(notes[:-1]) + " e " + notes[-1]
+        chord_txt=[]
+        for i in range(len(prog_numerals)):
+            numeral = prog_numerals[i]
+            degree=progression.prog_type.prog_degrees[i]
+            chord_type=chords[i].chord_type.description.lower()
+            chord_name=f"{chords[i].tonic.name}{chords[i].chord_type.symbol}"
+            chord_txt.append(f"{numeral}: No {degree}º grau constrói um acorde {chord_type}, resultando no acorde {chord_name}\n")
+        chord_txt="".join(chord_txt)
+
+        explanation = (f"A progressão do exercício é {prog_name} e ocorre na tonalidade de {tonic} {scale_type}, cujas notas são:\n"
+                       f"{notes_txt}.\n"
+                       f"Cada numeral indica um grau dessa escala e a qualidade do acode que aí se forma: \n"
+                       f"{chord_txt}\n")
 
         return explanation
 
