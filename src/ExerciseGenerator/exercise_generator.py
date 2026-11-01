@@ -164,19 +164,40 @@ class ExerciseGenerator: #Gerador de exercicios
             answer_options.append(answer_degree)
         return answer_options
 
+    def steps_to_txt(self, note_steps):
+        txt=[]
+        for step in note_steps:
+            if step == 1:
+                txt.append("um semitom")
+            elif step == 2:
+                txt.append("um tom")
+            else:
+                txt.append(f"{step} semitons")
+        if len(txt)==1:
+            return txt[0]
+        else:
+            return ", ".join(txt[:-1]) + " e " + txt[-1]
+
     def generate_scale_interval_explanation(self, scale, interval_note): #Constroi a explicação para o exercicio de intervalos
         tonic=scale.tonic.name
-        scale_type=scale.scale_type.description
-        intervals = "|".join( str(interval) for interval in scale.scale_type.note_steps)
-        note_names = "|".join(note.name for note in scale.notes)
-        index=scale.notes.index(interval_note)
-        degree=scale.scale_type.scale_degrees[index]
-        explanation=(f"A escala do exercicio é a escala de {tonic} {scale_type}\n"
-                     f"Uma escala {scale_type} é sempre obtida aplicando a seguinte série de intervalos entre notas consecutivas:\n"
-                     f"{intervals}\n"
-                     f"Para a tónica {tonic} a aplicação dos intervalos resulta na obtenção das notas da escala:\n"
-                     f"{note_names}\n"
-                     f"A nota reproduzida foi {interval_note.name} que corresponde ao {degree} grau diatónico")
+        type=scale.scale_type.description.lower()
+        steps=self.steps_to_txt(scale.scale_type.note_steps)
+        notes=[]
+        for i in range(len(scale.notes)):
+            notes.append(f"{scale.notes[i].name} ({scale.scale_type.scale_degrees[i]}º)")
+        if len(notes)==1:
+            notes_txt = notes[0]
+        else:
+            notes_txt=", ".join(notes[:-1]) + " e " + notes[-1]
+        d_index=scale.notes.index(interval_note)
+        degree=scale.scale_type.scale_degrees[d_index]
+
+        explanation=(f"A escala do exercicio é a de {tonic} {type}\n"
+                     f"A escala {type} é construida aplicando a seguinte sucessão de intervalos a partir da tónica:\n"
+                     f"{steps}\n"
+                     f"Para a tónica {tonic}, a aplicação dos intervalos resulta na obtenção das seguintes notas da escala:\n"
+                     f"{notes_txt}\n"
+                     f"A nota reproduzida foi {interval_note.name}, que corresponde ao {degree} grau diatónico")
         return explanation
 
     def generate_prog_exercise(self, difficulty, generate_options=True):
