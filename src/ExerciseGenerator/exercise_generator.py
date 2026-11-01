@@ -360,13 +360,20 @@ class ExerciseGenerator: #Gerador de exercicios
         tonic=chord.tonic.name
         chord_type=chord.chord_type.description
         symbol=chord.chord_type.symbol
-        intervals = "|".join( str(interval) for interval in chord.chord_type.note_steps)
-        note_names = "|".join(note.name for note in chord.notes)
-        explanation=(f"O acorde do exercício é {tonic}{symbol} ({chord_type})\n"
-                     f"Uma acorde {chord_type} é construido aplicando a seguinte série de intervalos entre notas consecutivas:\n"
-                     f"{intervals}\n"
-                     f"Para a tónica {tonic} a aplicação dos intervalos resulta na obtenção das notas do acorde:\n"
-                     f"{note_names}\n")
+        steps=self.steps_to_txt(chord.chord_type.note_steps)
+        notes = []
+        for i in range(len(chord.notes)):
+            notes.append(f"{chord.notes[i].name} ({chord.chord_type.chord_degrees[i]}º)")
+        if len(notes) == 1:
+            notes_txt = notes[0]
+        else:
+            notes_txt = ", ".join(notes[:-1]) + " e " + notes[-1]
+
+        explanation = (f"O acorde do exercício é {tonic}{symbol} ({chord_type})\n"
+                       f"Um acorde {chord_type} é construido aplicando a seguinte sucessão de intervalos a partir da tónica:\n"
+                       f"{steps}\n"
+                       f"Para a tónica {tonic}, a aplicação dos intervalos resulta na obtenção das seguintes notas do acorde:\n"
+                       f"{notes_txt}\n")
         return explanation
 
     def generate_rythm_exercise(self, difficulty):
