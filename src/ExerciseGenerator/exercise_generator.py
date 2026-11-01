@@ -164,19 +164,40 @@ class ExerciseGenerator: #Gerador de exercicios
             answer_options.append(answer_degree)
         return answer_options
 
+    def steps_to_txt(self, note_steps):
+        txt=[]
+        for step in note_steps:
+            if step == 1:
+                txt.append("um semitom")
+            elif step == 2:
+                txt.append("um tom")
+            else:
+                txt.append(f"{step} semitons")
+        if len(txt)==1:
+            return txt[0]
+        else:
+            return ", ".join(txt[:-1]) + " e " + txt[-1]
+
     def generate_scale_interval_explanation(self, scale, interval_note): #Constroi a explicação para o exercicio de intervalos
         tonic=scale.tonic.name
-        scale_type=scale.scale_type.description
-        intervals = "|".join( str(interval) for interval in scale.scale_type.note_steps)
-        note_names = "|".join(note.name for note in scale.notes)
-        index=scale.notes.index(interval_note)
-        degree=scale.scale_type.scale_degrees[index]
-        explanation=(f"A escala do exercicio é a escala de {tonic} {scale_type}\n"
-                     f"Uma escala {scale_type} é sempre obtida aplicando a seguinte série de intervalos entre notas consecutivas:\n"
-                     f"{intervals}\n"
-                     f"Para a tónica {tonic} a aplicação dos intervalos resulta na obtenção das notas da escala:\n"
-                     f"{note_names}\n"
-                     f"A nota reproduzida foi {interval_note.name} que corresponde ao {degree} grau diatónico")
+        type=scale.scale_type.description.lower()
+        steps=self.steps_to_txt(scale.scale_type.note_steps)
+        notes=[]
+        for i in range(len(scale.notes)):
+            notes.append(f"{scale.notes[i].name} ({scale.scale_type.scale_degrees[i]}º)")
+        if len(notes)==1:
+            notes_txt = notes[0]
+        else:
+            notes_txt=", ".join(notes[:-1]) + " e " + notes[-1]
+        d_index=scale.notes.index(interval_note)
+        degree=scale.scale_type.scale_degrees[d_index]
+
+        explanation=(f"A escala do exercicio é a de {tonic} {type}\n"
+                     f"A escala {type} é construida aplicando a seguinte sucessão de intervalos a partir da tónica:\n"
+                     f"{steps}\n"
+                     f"Para a tónica {tonic}, a aplicação dos intervalos resulta na obtenção das seguintes notas da escala:\n"
+                     f"{notes_txt}\n"
+                     f"A nota reproduzida foi {interval_note.name}, que corresponde ao {degree} grau diatónico")
         return explanation
 
     def generate_prog_exercise(self, difficulty, generate_options=True):
@@ -267,19 +288,30 @@ class ExerciseGenerator: #Gerador de exercicios
         tonic=progression.scale.tonic.name
         scale_type=progression.scale.scale_type.description
         prog_name=progression.prog_type.name
-        prog_type=progression.prog_type
-        degrees_exp=""
-        for i in range(len(prog_type.chord_types)):
-            degrees_exp=degrees_exp+f"Um acorde do tipo {progression.prog_chords[i].chord_type.description} no {prog_type.prog_degrees[i]}º grau da escala\n"
-        chords_exp=""
-        for chord in progression.prog_chords:
-            chords_exp=chords_exp+f"{chord.tonic.name}{chord.chord_type.symbol} ({chord.chord_type.description})\n"
+        prog_numerals=prog_name.split("-")
+        scale=progression.scale
+        chords=progression.prog_chords
 
-        explanation=(f"A progressão |{prog_name}| do exercício ocorre na escala de {tonic} {scale_type}\n"
-                     f"Uma progressão |{prog_name}| é contruida a partir de :\n"
-                     f"{degrees_exp}\n"
-                     f"Na escala de {tonic} {scale_type} esses acordes são:\n"
-                     f"{chords_exp}\n")
+        notes = []
+        for i in range(len(scale.notes)):
+            notes.append(f"{scale.notes[i].name} ({scale.scale_type.scale_degrees[i]}º)")
+        if len(notes) == 1:
+            notes_txt = notes[0]
+        else:
+            notes_txt = ", ".join(notes[:-1]) + " e " + notes[-1]
+        chord_txt=[]
+        for i in range(len(prog_numerals)):
+            numeral = prog_numerals[i]
+            degree=progression.prog_type.prog_degrees[i]
+            chord_type=chords[i].chord_type.description.lower()
+            chord_name=f"{chords[i].tonic.name}{chords[i].chord_type.symbol}"
+            chord_txt.append(f"{numeral}: No {degree}º grau constrói um acorde {chord_type}, resultando no acorde {chord_name}\n")
+        chord_txt="".join(chord_txt)
+
+        explanation = (f"A progressão do exercício é {prog_name} e ocorre na tonalidade de {tonic} {scale_type}, cujas notas são:\n"
+                       f"{notes_txt}.\n"
+                       f"Cada numeral indica um grau dessa escala e a qualidade do acode que aí se forma: \n"
+                       f"{chord_txt}\n")
 
         return explanation
 
@@ -328,13 +360,20 @@ class ExerciseGenerator: #Gerador de exercicios
         tonic=chord.tonic.name
         chord_type=chord.chord_type.description
         symbol=chord.chord_type.symbol
-        intervals = "|".join( str(interval) for interval in chord.chord_type.note_steps)
-        note_names = "|".join(note.name for note in chord.notes)
-        explanation=(f"O acorde do exercício é {tonic}{symbol} ({chord_type})\n"
-                     f"Uma acorde {chord_type} é construido aplicando a seguinte série de intervalos entre notas consecutivas:\n"
-                     f"{intervals}\n"
-                     f"Para a tónica {tonic} a aplicação dos intervalos resulta na obtenção das notas do acorde:\n"
-                     f"{note_names}\n")
+        steps=self.steps_to_txt(chord.chord_type.note_steps)
+        notes = []
+        for i in range(len(chord.notes)):
+            notes.append(f"{chord.notes[i].name} ({chord.chord_type.chord_degrees[i]}º)")
+        if len(notes) == 1:
+            notes_txt = notes[0]
+        else:
+            notes_txt = ", ".join(notes[:-1]) + " e " + notes[-1]
+
+        explanation = (f"O acorde do exercício é {tonic}{symbol} ({chord_type})\n"
+                       f"Um acorde {chord_type} é construido aplicando a seguinte sucessão de intervalos a partir da tónica:\n"
+                       f"{steps}\n"
+                       f"Para a tónica {tonic}, a aplicação dos intervalos resulta na obtenção das seguintes notas do acorde:\n"
+                       f"{notes_txt}\n")
         return explanation
 
     def generate_rythm_exercise(self, difficulty):
@@ -392,13 +431,16 @@ class ExerciseGenerator: #Gerador de exercicios
         measure_n=len(rythm.measures)
         measure_ex = ""
         for i, measure in enumerate(rythm.measures, start=1):
-            measure_ex+=f"O {i}º compasso é composto pelas seguintes notas:\n"
+            measure_ex+=f"-⮞ No {i}º compasso:  "
             for unit in measure:
-                measure_ex+=f"{unit.description} {unit.symbol} "
+                measure_ex+=f"Uma {unit.description} {unit.symbol}; "
             measure_ex+="\n"
-        explanation = (f"A fórmula de compasso do exercício é {compass}\n"
-                       f"O ritmo reproduzido é composto por {measure_n} compassos\n"
-                       f"{measure_ex}\n")
+        explanation = f"O ritmo está na fórmula {compass} e ocupa {measure_n}"
+        if measure_n == 1:
+            explanation+=" compasso.\n"
+        else:
+            explanation+=" compassos.\n"
+        explanation+=f"O ritmo reproduzido é composto por:\n {measure_ex}\n"
         return explanation
 
 
