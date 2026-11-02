@@ -420,13 +420,13 @@ class MIDI_feedback(QtWidgets.QWidget):
                 square.setStyleSheet(self.wrong_style)
 
 
-    def set_feedback(self, correct_inputs):
-        if not correct_inputs:
+    def paint_feedback(self):
+        if not self.input_flags:
             for square in self.squares:
                 square.setStyleSheet(self.wrong_style)
         else:
-            for i in range(len(correct_inputs)):
-                if correct_inputs[i]==True:
+            for i in range(len(self.input_flags)):
+                if self.input_flags[i]==True:
                     self.squares[i].setStyleSheet(self.correct_style)
                 else:
                     self.squares[i].setStyleSheet(self.wrong_style)
