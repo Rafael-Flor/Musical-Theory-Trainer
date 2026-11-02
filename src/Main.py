@@ -70,12 +70,19 @@ class Main:
         self.show_menu()
 
     def start_exercises(self, selected_exercise, selected_difficulty, selected_exercise_num, selected_mode):
-        self.exercise_manager.create_exercise_session(selected_exercise, selected_difficulty, selected_exercise_num, selected_mode) #Criar sessão com as configurações selecionadas na interface
-        self.show_exercise() #Exibir exercício na interface
+        start=True
         if selected_mode == "midi":
-            self.window.start_midi_feedback()
-            self.midi_listener.listen_for_key()
-            self.midi_listener.midi_key_pressed.subscribe(self.on_midi_input)
+            try:
+                self.midi_listener.listen_for_key()
+            except OSError as e:
+                self.window.show_error("MIDI", str(e))
+                start=False
+        if start:
+            self.exercise_manager.create_exercise_session(selected_exercise, selected_difficulty, selected_exercise_num,selected_mode)  # Criar sessão com as configurações selecionadas na interface
+            self.show_exercise()  # Exibir exercício na interface
+            if selected_mode == "midi":
+                self.window.start_midi_feedback()
+                self.midi_listener.midi_key_pressed.subscribe(self.on_midi_input)
 
     def show_exercise(self):
         session=self.exercise_manager.exercise_session
