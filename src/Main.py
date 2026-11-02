@@ -65,12 +65,14 @@ class Main:
         if session is not None and session.mode=="midi":
             self.midi_listener.midi_key_pressed.unsubscribe(self.on_midi_input)
             self.midi_listener.stop_listening()
+            self.window.stop_midi_feedback()
         self.show_menu()
 
     def start_exercises(self, selected_exercise, selected_difficulty, selected_exercise_num, selected_mode):
         self.exercise_manager.create_exercise_session(selected_exercise, selected_difficulty, selected_exercise_num, selected_mode) #Criar sessão com as configurações selecionadas na interface
         self.show_exercise() #Exibir exercício na interface
         if selected_mode == "midi":
+            self.window.start_midi_feedback()
             self.midi_listener.listen_for_key()
             self.midi_listener.midi_key_pressed.subscribe(self.on_midi_input)
 
@@ -148,6 +150,7 @@ class Main:
         if session.mode == "midi":
             self.midi_listener.midi_key_pressed.unsubscribe(self.on_midi_input)
             self.midi_listener.stop_listening()
+            self.window.stop_midi_feedback()
         self.show_eval()
 
     def show_eval(self):
