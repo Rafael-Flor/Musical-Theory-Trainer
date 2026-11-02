@@ -88,6 +88,8 @@ class Main:
         session=self.exercise_manager.exercise_session
         state=session.view_state()
         self.window.show_exercise(session.exercise_type, session.mode, state)
+        if session.mode=="midi":
+            self.window.set_midi_tries(session.current_tries())
 
     def next_exercise(self):
         session = self.exercise_manager.exercise_session
@@ -129,6 +131,7 @@ class Main:
         session.receive_input(midi_key)
         self.window.set_feedback(session.last_feedback)
         self.window.show_feedback()
+        self.window.set_midi_tries(session.current_tries())
         self.window.set_midi_feedback(session.get_input_feedback())
         if session.exercise_answered:
             self.window.set_continue_enabled(True)
