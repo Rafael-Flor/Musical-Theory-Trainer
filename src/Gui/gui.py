@@ -40,6 +40,9 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         #Conectar os sinais emitidos às ações a tomar
         self.main_menu.exercise_selected.connect(self.show_config_page)
 
+        #Páginas com feedback midi
+        self.midi_pages=(self.int_scale_exercise_page, self.chord_exercise_page)
+
 
     def show_config_page(self,exercise_title, exercise_code, modes): #Mostra a página de configuração
         self.config_page.continuar.setEnabled(True)
@@ -49,38 +52,42 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
     def show_menu(self):
         self.pages.setCurrentWidget(self.main_menu)
 
-    def show_mc_interval_scale_page(self, scale_info, options):
+    def show_mc_interval_scale_page(self, scale_info, options, progress):
         self.int_scale_exercise_page.set_current_exercise(scale_info)
         if self.int_scale_exercise_page.current_mode != "mc":
             self.int_scale_exercise_page.enable_multiple_choice()
+        self.int_scale_exercise_page.set_progress(progress)
         self.int_scale_exercise_page.multiple_choice.set_answer_options(options)
         self.int_scale_exercise_page.multiple_choice.enable_options()
         self.int_scale_exercise_page.feedback.hide()
         self.int_scale_exercise_page.set_continue_enabled(False)
         self.pages.setCurrentWidget(self.int_scale_exercise_page)
 
-    def show_midi_interval_scale_page(self, scale_info, input_len):
+    def show_midi_interval_scale_page(self, scale_info, input_len, progress):
         self.int_scale_exercise_page.set_current_exercise(scale_info)
         if self.int_scale_exercise_page.current_mode != "midi":
             self.int_scale_exercise_page.enable_midi()
+        self.int_scale_exercise_page.set_progress(progress)
         self.int_scale_exercise_page.midi_feedback.set_feedback_widget(input_len)
         self.int_scale_exercise_page.feedback.hide()
         self.int_scale_exercise_page.set_continue_enabled(False)
         self.pages.setCurrentWidget(self.int_scale_exercise_page)
 
-    def show_prog_page(self, prog_info, options):
+    def show_prog_page(self, prog_info, options, progress):
         if self.prog_exercise_page.current_mode != "mc":
             self.prog_exercise_page.enable_multiple_choice()
         self.prog_exercise_page.set_current_exercise(prog_info)
+        self.prog_exercise_page.set_progress(progress)
         self.prog_exercise_page.multiple_choice.set_answer_options(options)
         self.prog_exercise_page.multiple_choice.enable_options()
         self.prog_exercise_page.feedback.hide()
         self.prog_exercise_page.set_continue_enabled(False)
         self.pages.setCurrentWidget(self.prog_exercise_page)
 
-    def show_mc_chord_page(self, chord_info, options):
+    def show_mc_chord_page(self, chord_info, options, progress):
         if self.chord_exercise_page.current_mode != "mc":
             self.chord_exercise_page.enable_multiple_choice()
+        self.chord_exercise_page.set_progress(progress)
         self.chord_exercise_page.set_current_exercise(chord_info)
         self.chord_exercise_page.multiple_choice.set_answer_options(options)
         self.chord_exercise_page.multiple_choice.enable_options()
@@ -88,9 +95,10 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.chord_exercise_page.set_continue_enabled(False)
         self.pages.setCurrentWidget(self.chord_exercise_page)
 
-    def show_midi_chord_page(self, chord_info, input_len):
+    def show_midi_chord_page(self, chord_info, input_len, progress):
         if self.chord_exercise_page.current_mode != "midi":
             self.chord_exercise_page.enable_midi()
+        self.chord_exercise_page.set_progress(progress)
         self.chord_exercise_page.set_current_exercise(chord_info)
         self.chord_exercise_page.midi_feedback.set_feedback_widget(input_len)
         self.chord_exercise_page.feedback.hide()
@@ -100,19 +108,20 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
     def show_exercise(self, exercise_id, mode, state): #Mostra o exercício na interface
         match exercise_id, mode:
             case "interval_scale", "gui":
-                self.show_mc_interval_scale_page(state.info, state.options)
+                self.show_mc_interval_scale_page(state.info, state.options, state.progress)
             case "interval_scale", "midi":
-                self.show_midi_interval_scale_page(state.info, state.expected_input_len)
+                self.show_midi_interval_scale_page(state.info, state.expected_input_len, state.progress)
             case "harmonic_prog", "gui":
-                self.show_prog_page(state.info, state.options)
+                self.show_prog_page(state.info, state.options, state.progress)
             case "chord", "gui":
-                self.show_mc_chord_page(state.info, state.options)
+                self.show_mc_chord_page(state.info, state.options, state.progress)
             case "chord", "midi":
-                self.show_midi_chord_page(state.info, state.expected_input_len)
+                self.show_midi_chord_page(state.info, state.expected_input_len, state.progress)
             case "rythm", _:
-                self.show_rythm_page()
+                self.show_rythm_page(state.progress)
 
-    def show_rythm_page(self):
+    def show_rythm_page(self, progress):
+        self.rythm_exercise_page.set_progress(progress)
         self.rythm_exercise_page.feedback.hide()
         self.rythm_exercise_page.set_continue_enabled(False)
         self.pages.setCurrentWidget(self.rythm_exercise_page)
@@ -145,10 +154,15 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         if isinstance(self.pages.currentWidget(), ExPage):
             current_page.midi_feedback.start_painting()
 
-    def stop_midi_feedback(self):
+    def set_midi_tries(self, tries_txt):
         current_page = self.pages.currentWidget()
-        if isinstance(self.pages.currentWidget(), ExPage):
-            current_page.midi_feedback.stop_painting()
+        if isinstance(self.pages.currentWidget(), ExPage) and current_page.current_mode == "midi":
+            current_page.set_midi_tries(tries_txt)
+
+    def stop_midi_feedback(self):
+        for page in self.midi_pages:
+            if page.midi_feedback.paint_timer.isActive():
+                page.midi_feedback.stop_painting()
 
     def show_explanation_page(self, explanation):
         self.explanation_page.set_explanation(explanation)
@@ -287,11 +301,15 @@ class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
 
         self.title=QtWidgets.QLabel("")
         self.title.setObjectName("title")
+        self.progress = QtWidgets.QLabel("")
+        self.progress.setObjectName("progress")
         self.instructions=QtWidgets.QLabel("")
         self.instructions.setObjectName("instructions")
 
         self.midi_txt = QtWidgets.QLabel("")
         self.midi_txt.setObjectName("helper_txt")
+        self.midi_tries=QtWidgets.QLabel("")
+        self.midi_tries.setObjectName("midi_tries")
         self.midi_feedback=MIDI_feedback()
 
         self.multiple_choice_txt = QtWidgets.QLabel("")
@@ -309,10 +327,12 @@ class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
         self.continue_bt.clicked.connect(lambda: self.explanation_requested.emit())
 
         self.layout.addWidget(self.title)
+        self.layout.addWidget(self.progress)
         self.layout.addWidget(self.instructions)
         self.layout.addWidget(self.multiple_choice_txt)
         self.layout.addWidget(self.multiple_choice)
         self.layout.addWidget(self.midi_txt)
+        self.layout.addWidget(self.midi_tries)
         self.layout.addWidget(self.midi_feedback)
         self.layout.addWidget(self.feedback)
         self.layout.addStretch()
@@ -323,7 +343,10 @@ class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
         self.h_layout.addWidget(self.continue_bt)
         self.layout.addLayout(self.h_layout)
 
-
+    def set_midi_tries(self, tries_txt):
+        self.midi_tries.setText(tries_txt)
+    def set_progress(self, progress_txt):
+        self.progress.setText(progress_txt)
     def set_feedback(self, feedback): #Atualiza o feedback da resposta
         self.feedback.setText(feedback)
     def show_feedback(self): #Mostra o feedback da resposta
@@ -333,12 +356,14 @@ class ExPage(QtWidgets.QWidget): #Página para resolução de exercícios
         self.multiple_choice.show()
         self.midi_txt.hide()
         self.midi_feedback.hide()
+        self.midi_tries.hide()
         self.current_mode="mc"
     def enable_midi(self):
         self.midi_txt.show()
         self.midi_feedback.show()
         self.multiple_choice_txt.hide()
         self.multiple_choice.hide()
+        self.midi_tries.show()
         self.current_mode="midi"
 
     def set_continue_enabled(self, option):
@@ -525,8 +550,11 @@ class RythmExPage(QtWidgets.QWidget):
 
         self.title = QtWidgets.QLabel("Exercício de reconhecimento e execução de ritmo")
         self.title.setObjectName("title")
+        self.progress = QtWidgets.QLabel("")
+        self.progress.setObjectName("progress")
         self.instructions = QtWidgets.QLabel("Utilize o botão abaixo para reproduzir o ritmo, de seguida introduza o ritmo utilizando o botão 'Tap'")
         self.instructions.setObjectName("instructions")
+
 
         self.feedback = QtWidgets.QLabel("")
         self.feedback.setObjectName("feedback")
@@ -549,6 +577,7 @@ class RythmExPage(QtWidgets.QWidget):
         self.answer_bt.clicked.connect(lambda: self.answer_button_pressed.emit())
 
         self.layout.addWidget(self.title)
+        self.layout.addWidget(self.progress)
         self.layout.addWidget(self.instructions)
         self.layout.addWidget(self.rythm_bt)
         self.layout.addWidget(self.answer_bt)
@@ -560,6 +589,9 @@ class RythmExPage(QtWidgets.QWidget):
         self.h_layout.addStretch()
         self.h_layout.addWidget(self.continue_bt)
         self.layout.addLayout(self.h_layout)
+
+    def set_progress(self, progress_txt):
+        self.progress.setText(progress_txt)
 
     def set_feedback(self, feedback):  # Atualiza o feedback da resposta
         self.feedback.setText(feedback)

@@ -1,10 +1,11 @@
 import random
 
 class ViewState:
-    def __init__(self, info, options, expected_input_len):
+    def __init__(self, info, options, expected_input_len, progress):
         self.info = info
         self.options = options
         self.expected_input_len = expected_input_len
+        self.progress = progress
 
 class ExerciseSession: #Sessão para realização de um conjunto de exercícios
     def __init__(self, exercises, audio_engine):
@@ -17,10 +18,13 @@ class ExerciseSession: #Sessão para realização de um conjunto de exercícios
         self.evaluation="" #Nota qualificativa do desempenho
 
     def view_state(self):
-        return ViewState("", [], 0)
+        return ViewState("", [], 0, "")
 
     def current_exercise(self): #Retorna o exercício atual
         return self.exercises[self.current_index]
+
+    def current_progress(self): #Retorna o progresso na sessão (ex: exercício 1 de 10)
+        return f"Exercício {self.current_index+1} de {len(self.exercises)}"
 
     def next_exercise(self): #Avança a sessão para o próximo exercício
         self.current_index+=1
@@ -82,6 +86,9 @@ class MIDISession(ExerciseSession): #Sessões para exercícios com introdução 
         self.try_count = 0
         self.exercise_ratings = []
         self.last_feedback = ""
+
+    def current_tries(self):
+        return f"Tentativas realizadas: {self.try_count}"
 
     def receive_input(self, midi_key): #Recebe o input realizado através do dispositivo MIDI
         if not self.exercise_answered:
@@ -151,7 +158,8 @@ class IntervalScaleSession(MultipleCSession, IntervalScaleMethods): #Sessão par
     def view_state(self):
         info=self.current_exercise_scale_info()
         options=self.exercise_answer_options()
-        return ViewState(info, options, 0)
+        progress=self.current_progress()
+        return ViewState(info, options, 0, progress)
 
 class MidiIntervalSclSession(MIDISession, IntervalScaleMethods):
     def __init__(self,exercises, audio_engine):
@@ -162,7 +170,8 @@ class MidiIntervalSclSession(MIDISession, IntervalScaleMethods):
     def view_state(self):
         info = self.current_exercise_scale_info()
         options = []
-        return ViewState(info, options, 2)
+        progress=self.current_progress()
+        return ViewState(info, options, 2, progress)
 
     def validate_input(self):
         tonic=self.current_exercise().scale.tonic
@@ -210,7 +219,8 @@ class ProgressionSession(MultipleCSession): #Sessão para realização de exerc�
     def view_state(self):
         info = self.current_exercise_prog_info()
         options = self.exercise_answer_options()
-        return ViewState(info, options, 0)
+        progress=self.current_progress()
+        return ViewState(info, options, 0, progress)
 
     def play_exercise_prog(self): #Reproduz a progressão do exercício
         chords=self.current_exercise().progression.prog_chords
@@ -230,7 +240,8 @@ class ChordSession(MultipleCSession, ChordMethods): #Sessão para realização d
     def view_state(self):
         info = self.current_exercise_chord_info()
         options = self.exercise_answer_options()
-        return ViewState(info, options, 0)
+        progress=self.current_progress()
+        return ViewState(info, options, 0, progress)
 
 class MidiChordSession(MIDISession, ChordMethods):
     def __init__(self,exercises, audio_engine):
@@ -241,7 +252,8 @@ class MidiChordSession(MIDISession, ChordMethods):
     def view_state(self):
         info = self.current_exercise_chord_info()
         options = []
-        return ViewState(info, options, self.get_expected_input_len())
+        progress=self.current_progress()
+        return ViewState(info, options, self.get_expected_input_len(), progress)
 
     def validate_input(self):
         chord_notes=self.current_exercise().chord.notes
@@ -296,6 +308,11 @@ class RythmSession(ExerciseSession): #Sessão para realizar exercícios de ritmo
         self.input_count=0
         self.start_time=0
         self.rythm_speed=0.5
+        self.view_state()
+
+    def view_state(self):
+        progress=self.current_progress()
+        return ViewState("",[],0,progress)
 
     def play_exercise_rythm(self): #Reproduz o ritmo do exercício
         rythm=self.current_exercise().rythm
