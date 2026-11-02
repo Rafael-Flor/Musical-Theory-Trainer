@@ -127,6 +127,9 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         if isinstance(current_page, ExPage) or isinstance(current_page, RythmExPage):
             current_page.show_feedback()
 
+    def show_error(self, title, message):
+        QtWidgets.QMessageBox.warning(self, title, message)
+
     def set_continue_enabled(self, option):
         current_page=self.pages.currentWidget()
         if isinstance(current_page, ExPage) or isinstance(current_page, RythmExPage):
