@@ -159,6 +159,22 @@
 
 **Próxima semana:** Revisão da implementação da aplicação; Polimento da interface.
 
+---
+
+## Sem. 12 · 26 out - 1 nov
+
+**Feito:** 
+- Revisão da implementação:
+  - Correção de bugs e refactors
+  - Polimento da informação apresentada ao utilizador 
+- Polimento da interface gráfica       
+
+**Bloqueou:** Nada
+
+**Próxima semana:** Terminar tarefas de implementação; Terminar testes da implementação; Redação das secções em falta do relatório.
+
+
+
 
 
 
