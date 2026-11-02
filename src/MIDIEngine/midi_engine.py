@@ -29,5 +29,8 @@ class MidiListener:
             return
         port=self.port
         self.port = None
-        port.close()
-        print("Port closed")
+        try:
+            port.close()
+        except OSError: #Porta inválida; Desconexão de um dispositivo em uso por ex.
+            pass
+
