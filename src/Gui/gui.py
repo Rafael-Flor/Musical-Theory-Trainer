@@ -135,7 +135,17 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
     def set_midi_feedback(self,flags):
         current_page = self.pages.currentWidget()
         if isinstance(current_page, ExPage):
-            current_page.midi_feedback.set_feedback(flags)
+            current_page.midi_feedback.set_input_flags(flags)
+
+    def start_midi_feedback(self):
+        current_page = self.pages.currentWidget()
+        if isinstance(self.pages.currentWidget(), ExPage):
+            current_page.midi_feedback.start_painting()
+
+    def stop_midi_feedback(self):
+        current_page = self.pages.currentWidget()
+        if isinstance(self.pages.currentWidget(), ExPage):
+            current_page.midi_feedback.stop_painting()
 
     def show_explanation_page(self, explanation):
         self.explanation_page.set_explanation(explanation)
@@ -373,7 +383,23 @@ class MIDI_feedback(QtWidgets.QWidget):
         self.wrong_style="QFrame { background-color: rgb(28,34,41); border: 1px solid rgba(255,255,255,1); border-radius: 4px }"
         self.correct_style="QFrame {background-color: rgb(76,175,120); border: 1px solid rgba(255,255,255,1); border-radius: 4px }"
 
+        self.input_flags=[]
+        self.paint_timer = QtCore.QTimer(self)
+        self.paint_timer.setInterval(40)
+        self.paint_timer.timeout.connect(lambda: self.paint_feedback())
         self.squares=[]
+
+    def set_input_flags(self, input_flags):
+        self.input_flags=input_flags
+
+    def start_painting(self):
+        if not self.paint_timer.isActive():
+            self.paint_timer.start()
+
+    def stop_painting(self):
+        self.paint_feedback()
+        self.paint_timer.stop()
+
 
     def set_feedback_widget(self, input_n):
         if len(self.squares)  > input_n:
