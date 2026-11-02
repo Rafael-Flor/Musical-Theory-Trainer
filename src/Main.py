@@ -20,6 +20,7 @@ class Main:
         self.app = QtWidgets.QApplication([])
         self.window = MainWindow()
         self.window.setFixedSize(900, 700)
+        self.window.setWindowTitle("Musical Theory Trainer")
         self.window.main_menu.set_main_menu(EXERCISES)
         self.window.show()
 
