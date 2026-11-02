@@ -15,6 +15,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.pages = QtWidgets.QStackedWidget() #Guarda Páginas(Ecrãs) da interface
 
         #Instanciar páginas da interface
+        self.start_page = StartPage()
         self.main_menu = MainMenu()
         self.config_page = ConfigPage()
         self.int_scale_exercise_page = IntervalScaleExPage()
@@ -25,6 +26,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.evaluation_page = EvaluationPage()
 
         #Adicionar páginas às páginas da interface
+        self.pages.addWidget(self.start_page)
         self.pages.addWidget(self.main_menu)
         self.pages.addWidget(self.config_page)
         self.pages.addWidget(self.int_scale_exercise_page)
@@ -38,6 +40,7 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.setCentralWidget(self.pages)
 
         #Conectar os sinais emitidos às ações a tomar
+        self.start_page.continue_pressed.connect(self.show_menu)
         self.main_menu.exercise_selected.connect(self.show_config_page)
 
         #Páginas com feedback midi
@@ -171,6 +174,26 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
     def show_evaluation_page(self, results):
         self.evaluation_page.set_stats(results)
         self.pages.setCurrentWidget(self.evaluation_page)
+
+class StartPage(QtWidgets.QWidget):
+    continue_pressed = QtCore.Signal()
+    def __init__(self):
+        super().__init__()
+        self.layout = QtWidgets.QVBoxLayout(self)
+        self.layout.setAlignment(QtCore.Qt.AlignCenter)
+
+        self.title = QtWidgets.QLabel("Musical Theory Trainer")
+        self.title.setObjectName("start_title")
+        self.title.setAlignment(QtCore.Qt.AlignCenter)
+
+        self.start_bt = QtWidgets.QPushButton("Start")
+        self.start_bt.setObjectName("start_bt")
+        self.start_bt.clicked.connect(self.continue_pressed.emit)
+
+        self.layout.addWidget(self.title)
+        self.layout.addWidget(self.start_bt)
+
+
 
 class MainMenu(QtWidgets.QWidget): #Página do menu principal
 
