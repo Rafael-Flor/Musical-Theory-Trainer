@@ -78,8 +78,8 @@ class ExerciseGenerator: #Gerador de exercicios
                                 "hard":("MajorDiatonics","MinorDiatonics","Major7thDiatonics","Minor7thDiatonics","MajorSus2","MinorSus2","MajorSus4","MinorSus4")}
     prog_len_difficulty_settings = {"easy":(2,),"medium":(2,3,4),"hard": (4,5,6)}
     chord_difficulty_settings ={"easy":("Major","Minor"), "medium":("Major","Minor","Major7","Minor7","7"),"hard":("Major","Minor","Major7","Minor7","7","Diminished","Diminished7","Halfdiminished7","Sus2","Sus4")}
-    rythm_cmp_difficulty_settings={"easy":("4/4",),"medium":("4/4","3/4","2/4"),"hard":("4/4","3/4","2/4","5/4","7/4")}
-    rythm_len_difficulty_settings={"easy":1, "medium":2, "hard":3}
+    rythm_cmp_difficulty_settings={"easy":("4/4",),"medium":("4/4","3/4","2/4"),"hard":("4/4","3/4","2/4","5/4")}
+    rythm_len_difficulty_settings={"easy":1, "medium":2, "hard":2}
     rythm_unit_difficulty_settings={"easy":("Half","Quarter"),"medium":("Whole","Half","Quarter","Eighth"),"hard":("Whole","Half","Quarter","Eighth","Sixteenth")}
 
     def __init__(self, theory_model):
@@ -211,7 +211,7 @@ class ExerciseGenerator: #Gerador de exercicios
 
         explanation = self.generate_prog_explanation(progression)
 
-        return ProgressionExercise(progression, "Reconhecimento de progressões hamónicas", prog_type_name, wrong_options, explanation)
+        return ProgressionExercise(progression, "Reconhecimento de progressões harmónicas", prog_type_name, wrong_options, explanation)
 
     def generate_prog(self, difficulty): #Gera uma progressão harmónica
 
@@ -310,7 +310,7 @@ class ExerciseGenerator: #Gerador de exercicios
 
         explanation = (f"A progressão do exercício é {prog_name} e ocorre na tonalidade de {tonic} {scale_type}, cujas notas são:\n"
                        f"{notes_txt}.\n"
-                       f"Cada numeral indica um grau dessa escala e a qualidade do acode que aí se forma: \n"
+                       f"Cada numeral indica um grau dessa escala e a qualidade do acorde que aí se forma: \n"
                        f"{chord_txt}\n")
 
         return explanation
