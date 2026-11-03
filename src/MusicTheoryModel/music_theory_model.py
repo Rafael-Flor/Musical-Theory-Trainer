@@ -1,10 +1,10 @@
-class Note: #Nota musical
+class Note:
 
     def __init__(self, pitch, name):
 
         if pitch in range(0,128):
-            self.pitch=pitch #Tom da nota em semitons
-            self.name=name
+            self.pitch=pitch        #Tom da nota em semitons a partir de C-1=0 e até G9 (127) (valores MIDI)
+            self.name=name          #Nome da nota (pode haver nomes distintos para o mesmo pitch)
 
         else:
             raise ValueError(f"Invalid pitch value {pitch}")
@@ -30,49 +30,49 @@ class ChordProg: #Progressão Harmónica
 
 class ScaleType: #Formato genérico para um tipo de escala
     def __init__(self, name, scale_degrees, note_steps, description):
-        self.name=name
-        self.scale_degrees = scale_degrees #graus em relação à escala diatónica mãe
-        self.note_steps=note_steps #intervalos entre graus da escala, em semitons
-        self.description=description
+        self.name=name                      #Id (ex.Major)
+        self.scale_degrees = scale_degrees  #Graus da escala na diatónica de origem
+        self.note_steps=note_steps          #Intervalos entre graus consecutivos (em semitons)
+        self.description=description        #Designação textual (ex: maior )
 
 class ChordType: #Formato genérico para um tipo de acorde
     def __init__(self, name, chord_degrees, note_steps, symbol, description):
-        self.name=name
-        self.chord_degrees=chord_degrees
-        self.note_steps=note_steps
-        self.symbol=symbol
-        self.description=description
+        self.name=name                      #Id (ex. Major7)
+        self.chord_degrees=chord_degrees    #Graus do acorde na escala
+        self.note_steps=note_steps          #Intervalos, em semitons, entre notas consecutivas do acorde
+        self.symbol=symbol                  #Designação simbólica (ex. maj7)
+        self.description=description        #Designação textual (ex. maior com sétima)
 
 class ChordProgType: #Formato genérico para um tipo de progressão harmónica
     def __init__(self, name, chord_types, prog_degrees):
-        self.name=name
-        self.chord_types=chord_types
-        self.prog_degrees=prog_degrees
+        self.name=name                      #Numerais (ex. I-iv)
+        self.chord_types=chord_types        #Ids ChordType; qualidade dos acordes que compõem a progressão
+        self.prog_degrees=prog_degrees      #Graus na tonalidade
 
-class ProgDegreeSet: #Conjunto de graus que podem compor uma progressão harmónica
+class ProgDegreeSet: #Conjunto de graus para compor progressões
     def __init__(self, name, chord_types, chord_degrees, mode):
-        self.name=name
-        self.chord_types=chord_types
-        self.chord_degrees=chord_degrees
-        self.mode=mode
+        self.name=name                      #Id do conjunto (ex. MajorDiatonics)
+        self.chord_types=chord_types        #Numerais e respetivos ids de acordes; (ex. chord_t[V7] -> 7)
+        self.chord_degrees=chord_degrees    #Graus dos acordes no conjunto
+        self.mode=mode                      #Modo base do conjunto (ex. Major)
 
 class RythmUnit: #Unidade rítmica para construir ritmos
     def __init__(self, name, duration, symbol, description):
-        self.name=name
-        self.duration=duration
+        self.name=name                      #Id ex.(Quarter)
+        self.duration=duration              #Fração do compasso ex.(1/4)
         self.symbol=symbol
-        self.description=description
+        self.description=description        #Designação textual (ex. semínima)
 
-class Rythm:
+class Rythm: #Ritmo
     def __init__(self, compass, measures):
-        self.compass=compass
-        self.measures=measures
+        self.compass=compass                #Fórmula de compasso (ex.4/4)
+        self.measures=measures              #Lista de compassos, cada um preenchido por unidades rítmicas (RyhtmUnit)
 
 
 
 class MusicTheoryModel:
-    NATURAL_NOTE_NAMES=["C","D","E","F","G","A","B"]
-    TONICS = (
+    NATURAL_NOTE_NAMES=["C","D","E","F","G","A","B"]    #Nomes das notas naturais
+    TONICS = (                              #Tónicas possíveis
         Note(0, "C"),
         Note(1, "C#"),
         Note(1, "Db"),
@@ -111,7 +111,7 @@ class MusicTheoryModel:
             ChordType("Sus2", [1, 2, 5], [2, 5], "sus2", "Suspenso 2"),
             ChordType("Sus4", [1, 4, 5], [5, 2], "sus4", "Suspenso 4"),
         ]
-        self.prog_degrees=[     #Definição dos conjuntos de graus para compor progressões harmónicas
+        self.prog_degrees=[     #Definição dos conjuntos para compor progressões harmónicas
             ProgDegreeSet("MajorDiatonics",{"I": "Major", "ii": "Minor", "iii": "Minor", "IV": "Major", "V": "Major", "vi": "Minor","viiº": "Diminished"},[1,2,3,4,5,6,7],"Major"),
             ProgDegreeSet("Major7thDiatonics", {"Imaj7": "Major7", "ii7": "Minor7", "iii7": "Minor7", "IVmaj7": "Major7", "V7": "7","vi7": "Minor7", "viiø7": "Halfdiminished7"}, [1,2,3,4,5,6,7],"Major"),
             ProgDegreeSet("MinorDiatonics",{"i": "Minor", "iiº": "Diminished", "III": "Major", "iv": "Minor", "v": "Minor","VI": "Major", "VII": "Major"}, [1, 2, 3, 4, 5, 6, 7], "Minor"),
