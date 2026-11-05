@@ -21,7 +21,7 @@ class Main:
         self.window = MainWindow()
         self.window.setFixedSize(900, 700)
         self.window.setWindowTitle("Musical Theory Trainer")
-        self.window.main_menu.set_main_menu(EXERCISES)
+        self.set_main_menu()
         self.window.show()
 
         #Ecrãs da interface
@@ -56,6 +56,10 @@ class Main:
         self.r_screen.answer_button_pressed.subscribe(self.process_r_input)
         self.r_screen.explanation_requested.subscribe(self.show_explanation)
         self.r_screen.menu_requested.subscribe(self.abandon_and_show_menu)
+
+    def set_main_menu(self):
+        for exercise in EXERCISES:
+            self.window.add_menu_option(exercise["title"], exercise["id"], exercise["modes"])
 
 
     def show_menu(self): #Mostra menu de seleção de exercícios
