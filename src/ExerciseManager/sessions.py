@@ -65,17 +65,19 @@ class MultipleCSession(ExerciseSession): #Sessões para exercícios de escolha m
 
     def set_result_stats(self): #Calcula e atualiza as estatisticas de desempenho
         self.accuracy=(self.correct_count / len(self.exercises)) * 100
-        if  self.accuracy <= 25:
+        if  self.accuracy < 25:
             self.evaluation="Fraco"
-        elif self.accuracy <= 50:
+        elif self.accuracy < 50:
             self.evaluation="Insuficiente"
-        elif self.accuracy<= 75:
+        elif self.accuracy< 75:
             self.evaluation="Suficiente"
-        elif self.accuracy <= 100:
+        elif self.accuracy < 100:
             self.evaluation="Bom"
+        elif self.accuracy == 100:
+            self.evaluation = "Excelente"
 
     def get_result_stats(self):
-        return [("Numero de exercícios corretos", self.correct_count),("Precisão", self.accuracy),("Avaliação",self.evaluation)]
+        return [("Numero de exercícios corretos", f"{self.correct_count}/{len(self.exercises)}"),("Percentagem de respostas coretas:", f"{round(self.accuracy,2)}%"),("Avaliação",self.evaluation)]
 
 class MIDISession(ExerciseSession): #Sessões para exercícios com introdução de respostas via dispositivo MIDI
     def __init__(self,exercises, audio_engine):
@@ -108,13 +110,17 @@ class MIDISession(ExerciseSession): #Sessões para exercícios com introdução 
         self.accuracy=sum(self.exercise_ratings)/len(self.exercise_ratings)
         if self.accuracy < 1.5:
             self.evaluation = "Fraco"
+        elif self.accuracy < 2:
+            self.evaluation = "Insuficiente"
         elif self.accuracy < 2.5:
             self.evaluation = "Suficiente"
-        else:
+        elif self.accuracy < 3:
             self.evaluation = "Bom"
+        elif self.accuracy==3:
+            self.evaluation = "Excelente"
 
     def get_result_stats(self):
-        return [("Precisão", self.accuracy/3),("Avaliação",self.evaluation)]
+        return [("Nota média", f"{self.accuracy}/3"),("Nota em percentagem", f"{round((self.accuracy/3) * 100,2)}%"),("Avaliação",self.evaluation)]
 
 class IntervalScaleMethods: #Métodos para os exercícios de reconhecimento de intervalos em escalas
 
@@ -265,7 +271,7 @@ class MidiChordSession(MIDISession, ChordMethods):
 
         matching_index = None
         for i in range(len(chord_pitches)):
-            if chord_pitches[i]==pitch and not self.correct_inputs[i]:
+            if chord_pitches[i]==pitch:
                 matching_index=i
         if matching_index is None:
             self.last_feedback = "Nota incorreta"
@@ -333,9 +339,9 @@ class RythmSession(ExerciseSession): #Sessão para realizar exercícios de ritmo
                         attack_count += 1
                 target=self.current_exercise().attack_times[self.input_count]/self.rythm_speed+self.start_time #Tempo alvo do próximo ataque do ritmo
                 error=abs(target-time)*100 #Erro do input em relação ao tempo alvo
-                if error <= 25: #Classificar o input com base no erro
+                if error <= 10: #Classificar o input com base no erro
                     self.exercise_accuracies.append(3)
-                elif error <= 50:
+                elif error <= 20:
                     self.exercise_accuracies.append(2)
                 else:
                     self.exercise_accuracies.append(1)
@@ -346,8 +352,9 @@ class RythmSession(ExerciseSession): #Sessão para realizar exercícios de ritmo
                     self.set_answer_accuracy()
 
     def get_last_rating_feedback(self):
+        if not self.answer_ratings:
+            return ""
         rating=self.answer_ratings[-1]
-        print(rating)
         if rating < 1.5:
             return "Fraco"
         elif rating < 2.5:
@@ -356,16 +363,27 @@ class RythmSession(ExerciseSession): #Sessão para realizar exercícios de ritmo
             return "Bom"
 
     def set_answer_accuracy(self): #Adiciona a média do desempenho no exercício à lista de avaliações da sessão
-        self.answer_ratings.append(sum(self.exercise_accuracies)/(len(self.exercise_accuracies)))
+        if len(self.exercise_accuracies)>0:
+            return self.answer_ratings.append(sum(self.exercise_accuracies)/(len(self.exercise_accuracies)))
+        else:
+            return 0
 
     def set_result_stats(self): #Atualiza as estatisticas de desempenho
-        self.accuracy=sum(self.answer_ratings)/len(self.answer_ratings)
+        if len(self.answer_ratings)>0:
+            self.accuracy=sum(self.answer_ratings)/len(self.answer_ratings)
+        else:
+            self.accuracy=0
+
         if self.accuracy < 1.5:
             self.evaluation = "Fraco"
+        elif self.accuracy < 2:
+            self.evaluation = "Insuficiente"
         elif self.accuracy < 2.5:
             self.evaluation = "Suficiente"
-        else:
+        elif self.accuracy < 3:
             self.evaluation = "Bom"
+        elif self.accuracy ==3:
+            self.evaluation = "Excelente"
 
     def next_exercise(self): #Avana para o próximo exercício da sessão
         self.current_index+=1
@@ -374,4 +392,4 @@ class RythmSession(ExerciseSession): #Sessão para realizar exercícios de ritmo
         self.input_count=0
 
     def get_result_stats(self):
-        return [("Precisão", self.accuracy/3),("Avaliação",self.evaluation)]
+        return [("Nota média nos tempos", f"{self.accuracy}/3"),("Nota em percentagem", f"{round((self.accuracy/3*100),2)}%"),("Avaliação",self.evaluation)]
