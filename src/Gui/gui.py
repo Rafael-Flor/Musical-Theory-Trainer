@@ -47,6 +47,9 @@ class MainWindow(QtWidgets.QMainWindow): #Janela da interface gráfica
         self.midi_pages=(self.int_scale_exercise_page, self.chord_exercise_page)
 
 
+    def add_menu_option(self, title, id, modes):
+        self.main_menu.set_menu_bt(title, id, modes)
+
     def show_config_page(self,exercise_title, exercise_code, modes): #Mostra a página de configuração
         self.config_page.continuar.setEnabled(True)
         self.config_page.set_exercise(exercise_title, exercise_code, modes) #Atualizar página com informação do exercício
@@ -213,12 +216,11 @@ class MainMenu(QtWidgets.QWidget): #Página do menu principal
 
         #Configurar o estilo dos elementos da página
 
-    def set_main_menu(self, exercises):
-        #Criar elementos da página
-        for exercise in exercises:
-            button = QtWidgets.QPushButton("◈   " + exercise["title"])
-            button.clicked.connect(lambda checked=False, ex=exercise: self.exercise_selected.emit(ex["title"], ex["id"], ex["modes"]))
-            self.layout.addWidget(button)
+    def set_menu_bt(self, title, id, modes):
+
+        button = QtWidgets.QPushButton("◈   " + title)
+        button.clicked.connect(lambda checked=False: self.exercise_selected.emit(title, id, modes))
+        self.layout.addWidget(button)
 
 
 class ConfigPage(QtWidgets.QWidget): #Página de configuração de exercícios
