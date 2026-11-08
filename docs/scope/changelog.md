@@ -173,6 +173,23 @@
 
 **Próxima semana:** Terminar tarefas de implementação; Terminar testes da implementação; Redação das secções em falta do relatório.
 
+## Sem. 13 · 2 - 8 nov
+
+**Feito:** 
+- Revisão da implementação:
+  - Revisão do feedback midi na interface
+  - Adicionar mensagem de erro (falta de dispositivo midi) ao configurar exerícios
+  - Adicionar exibição de progresso na realização de exercícios
+  - Adicionar exibição de tentativas midi
+  - revisão das configurações de dificuldade
+  - revisão das classificações e estatísticas de avaliação
+- Finalização do bloco de testes
+- Continuidade da redação do relatório    
+
+**Bloqueou:** Nada
+
+**Próxima semana:** Terminar redação do relatório e elaborar documentação pendente.
+
 
 
 
